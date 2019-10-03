@@ -77,13 +77,25 @@ class FuncionarioController extends Controller
             $telefono = $request -> telefono;
             $idPuesto = $request -> idPuesto;
             $sql = $this->FuncionesTSQL->crudFuncionario($id,$nombre,$priApellido,$segApellido,$correo,$telefono,$idPuesto,$request -> btn);
-            return view('mensaje')->with('mensaje', $sql);     
+            if(isset($sql)){
+                return view('srgalEditar/EditarFuncionario')->with('idFuncionario', $sql);
+            }
+                 
+            
         }
 
         if($request -> btn == 'consultar'){
             $id = $request -> idFuncionario;
+
             $funcionario = $this->FuncionesTSQL->crudFuncionario($id,'','','','','',0,$btn);
-                return view('srgalEditar/EditarFuncionario')->with('idFuncionario', $funcionario)->with('puesto',$puesto);
+            foreach($funcionario as $f){
+                if(isset($f->mensaje)){
+                    return view('srgalEditar/EditarFuncionario')->with('idFuncionario',$funcionario)->with('puesto',$puesto);
+                } 
+                else{
+                    return view('srgalEditar/EditarFuncionario')->with('idFuncionario', $funcionario)->with('puesto',$puesto);
+                }
+            } 
         }
 
         if($request -> btn == 'borrar'){

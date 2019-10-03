@@ -1,5 +1,5 @@
 @extends('admin.template.plantillaNuevoReporte')
-    
+
     @section('EncabezadoReporte')
         <form method="" data-toggle="validator">
             {{ csrf_field()}}
@@ -41,10 +41,10 @@
                     <textarea type="text" class="form-control border-dark" placeholder="Escribir"></textarea>
             </div>
             <hr class="border-warning">
-        </form
+        </form>
     @stop
     @section('ActividadAmbiental')
-        <form action="" method="" data-toggle="validator">
+        <form action="EditarReporte" method="POST" data-toggle="validator">
             {{ csrf_field()}}
                 <h6 class="modal-title text-center">ACTIVIDAD AMBIENTAL</h6>
                 <hr class="border-warning">
@@ -54,16 +54,16 @@
                         <textarea type="text" class="form-control border-dark" placeholder="Escribir"></textarea>
                     </div>
                     <div class="container col-6 border-dark">
-                    <h7 class="modal-title text-center">Tipo de Actividad</h7>
-                    <hr class="border-dark">
+                        <h6 class="modal-title text-center">Tipo de Actividad</h6>
+                        <hr class="border-dark">
                         <div class="float-right">
-                            <button type="btn" name="btn" value="insertar" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary bg-dark btn-block form-control" style="width: 100px">
+                            <button type="button" name="btn" value="insertar" data-toggle="modal" data-target="#exampleModal" class="btn btn-secondary bg-dark btn-block form-control" style="width: 100px">
                                 Agregar
                             </button>
-                            <button type="btn" name="btn" value="consultar" class="btn btn-secondary bg-dark btn-block form-control" style="width: 100px">
+                            <button type="button" name="btn" value="consultar" data-toggle="modal" data-target="#exampleModal1" class="btn btn-secondary bg-dark btn-block form-control" style="width: 100px">
                                 Editar
                             </button>
-                            <button type="btn" name="btn" value="borrar" class="btn btn-secondary bg-dark btn-block form-control" style="width: 100px">
+                            <button type="button" name="btn" value="borrar" class="btn btn-secondary bg-dark btn-block form-control" style="width: 100px">
                                 Borrar
                             </button>
                             <!-- Agregar -->
@@ -78,11 +78,11 @@
                                         </div>
                                         <div class="modal-body">
                                             <div class="container border border-dark bg-light">
-                                                <form action="" method="">
+                                                <form action="EditarReporte" method="POST" data-toggle="validator">
                                                     {{ csrf_field()}}
                                                     <div class="form-group text-center">
                                                         <label class="font-weight-bold">INGRESE UN NUEVO TIPO DE ACTIVIDAD</label>
-                                                        <input type="text" name="nombreActividad" class="form-control text-center" aria-describedby="Ingrese un tipo de actividad" placeholder="------ESCRIBIR------" required>
+                                                        <input type="text" name="nombreActividad" class="form-control text-center" aria-describedby="Ingrese un tipo de actividad" placeholder="------ESCRIBIR------" required="true">
                                                         <small id="puestoHelp" class="form-text text-muted">Escriba el nuevo tipo de actividad.</small>
                                                     </div>
                                                 </form>
@@ -90,23 +90,52 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">CERRAR</button>
-                                            <button type="button" class="btn btn-secondary">GUARDAR</button>
+                                            <button type="button" name="btn" class="btn btn-secondary" data-dismiss="modal">CERRAR</button>
+                                            <button type="submit" value="nuevo" name="btn" class="btn btn-secondary">GUARDAR</button>
                                         </div>
                                     </div>
                                 </div>
                             </div> 
-                            <!-- editar  --> 
+                            <!-- editar  -->
+                            <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title font-weight-bold" id="exampleModalLabel1">EDITAR TIPO DE ACTIVIDAD</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="container border border-dark bg-light">
+                                                <form action="EditarReporte" method="POST" data-toggle="validator">
+                                                    {{ csrf_field()}}
+                                                    <div class="form-group text-center">
+                                                        <label class="font-weight-bold">EDITE EL TIPO DE ACTIVIDAD</label>                  
+                                                        <input type="text" value="" class="form-control text-center" readonly>                           
+                                                        <input type="text" name="nomActividad" class="form-control text-center" aria-describedby="Ingrese un tipo de actividad" placeholder="------NUEVO------" required="true">
+                                                        <small id="puestoHelp" class="form-text text-muted">Escriba el nuevo tipo de actividad.</small>
+                                                    </div>
+                                                </form>
+                                                <br>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" name="btn" class="btn btn-secondary" data-dismiss="modal">CERRAR</button>
+                                            <button type="submit" value="editar" name="btn" class="btn btn-secondary">GUARDAR</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  
                         </div>
-                        <div class="col-10">
+                        <div class="col-8">
                             <select id="idTipoActividad" name="idTipoActividad" class="form-control border-dark" required="true">     
-                                <option value="{{null}}" selected>--SELECCIONE--</option>
+                                <option selected>--SELECCIONE--</option>
                                 @foreach($tipoActividad as $t)
-                                <option value="{{$t->nombreActividad}}">{{$t->nombreActividad}}</option>
+                                <option value="{{$t->idTipoActividad}}">{{$t->nombreActividad}}</option>
                                 @endforeach
                             </select>
-                        </div>
-                        
+                        </div>               
                     </div>
                 </div>
                 <div class="row text-center">
@@ -120,25 +149,16 @@
                     </div>
                 </div>
                 <hr class="border-warning">
-        </form
-    @stop
-    @section('TipoDeActividad')
-        <form action="" method="" data-toggle="validator">
-            {{ csrf_field()}}
-                <h6 class="modal-title text-center">TIPO DE ACTIVIDAD</h6>
-                <hr class="border-warning">
-                
-                <hr class="border-warning">
-        </form
+        </form>
     @stop
     @section('Objetivos')
         <form action="" method="" data-toggle="validator">
             {{ csrf_field()}}
                 <h6 class="modal-title text-center">OBJETIVOS</h6>
                 <hr class="border-warning">
-                
+
                 <hr class="border-warning">
-        </form
+        </form>
     @stop
     
 

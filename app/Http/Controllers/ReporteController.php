@@ -25,5 +25,20 @@ class ReporteController extends Controller
 
     public function AccionReporte(Request $request){
 
+        if($request -> btn == 'nuevo'){                   
+           $idTipoActividad = null;
+           $nombreActividad = $request -> nombreActividad;
+            $sql = $this->FuncionesTSQL->crudTipoActividad($idTipoActividad,$nombreActividad,$request -> btn);
+        return $this -> NuevoReporte();
+        }
+
+        if($request -> btn == 'consultar'){                   
+            $idTipoActividad = $request -> idTipoActividad;
+            $nombreActividad = "";
+             $sql = $this->FuncionesTSQL->crudTipoActividad($idTipoActividad,$nombreActividad,$request -> btn);
+             return view('mensaje')->with('mensaje', $sql);
+         }
+
     }
+
 }

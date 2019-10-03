@@ -8,7 +8,17 @@ Editar Funcionario
 
 @section('contenido')
     @foreach($idFuncionario as $f)
+        @if(isset($f->mensaje))
+            <div class="alert">
+                <script type="text/javascript">
+                alert("{{$f->mensaje}}");
+                history.back(); 
+                </script>           
+            </div>
+        @else
         <form action="EditarFuncionario" method="POST" data-toggle="validator">
+        <h5 class="text-center font-weight-bold">Editar Funcionario</h5>
+        <hr class="border-dark">
             {{ csrf_field()}}
             <div class="form-row">
                 <div class="form-group col-sm-3">
@@ -24,52 +34,55 @@ Editar Funcionario
                 </div>
             </div>
         </form>
-        <form action="EditarFuncionario" method="POST" data-toggle="validator">
-            {{ csrf_field()}}
-            <!--Aqui comienza -->
-            <div class="form-group">
-                <label for="cedula">Cedula</label>
-                <input type="text" name="cedula" value="{{$f->cedula}}" class="form-control" readonly>
-            </div>
-            <div class="form-group">
-                <label for="nombre">Nombre</label>
-                <input type="text" name="nombre" value="{{$f->nombre}}" class="form-control" placeholder="Nombre" required="true">
-            </div>
-            <div class="form-group">
-                <label for="priApellido">Primer Apellido</label>
-                <input type="text" name="priApellido" value="{{$f->priApellido}}" class="form-control" placeholder="Apellido 1" required="true">
-            </div>
-            <div class="form-group">
-                <label for="segApellido">Segundo Apellido</label>
-                <input type="text" name="segApellido" value="{{$f->segApellido}}" class="form-control" placeholder="Apellido 2" required="true">
-            </div>
+
+            <form action="EditarFuncionario" method="POST" data-toggle="validator">
+                {{ csrf_field()}}
+                <!--Aqui comienza -->
+                <div class="form-group">
+                    <label for="cedula">Cedula</label>
+                    <input type="text" name="cedula" value="{{$f->cedula}}" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" name="nombre" value="{{$f->nombre}}" class="form-control" placeholder="Nombre" required="true">
+                </div>
+                <div class="form-group">
+                    <label for="priApellido">Primer Apellido</label>
+                    <input type="text" name="priApellido" value="{{$f->priApellido}}" class="form-control" placeholder="Apellido 1" required="true">
+                </div>
+                <div class="form-group">
+                    <label for="segApellido">Segundo Apellido</label>
+                    <input type="text" name="segApellido" value="{{$f->segApellido}}" class="form-control" placeholder="Apellido 2" required="true">
+                </div>
 
 
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="email">Correo</label>
-                    <input type="email" name="correo" value="{{$f->correo}}" class="form-control" placeholder="correo@algo.com" required="true">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="email">Correo</label>
+                        <input type="email" name="correo" value="{{$f->correo}}" class="form-control" placeholder="correo@algo.com" required="true">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="telefono">Telefono</label>
+                        <input type="number-phone" name="telefono" value="{{$f->telefono}}" class="form-control" placeholder="8888-8888" required="true">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="idPuesto">Puesto Actual: {{$f->idPuesto}}</label>
+                        <select id="idPuesto" name="idPuesto" class="form-control" required="true">     
+                            <option value="{{null}}" selected>Seleccion de otro puesto</option>
+                            @foreach($puesto as $p)
+                            <option value="{{$p->idPuesto}}">{{ $p->nombrePuesto }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="guardar">Confirme para actualizar los datos....</label>
+                        <button type="submit" name="btn" value="editar" class="btn btn-primary form-control bg-dark">Actualizar</button>
+                    </div>
+                </div> 
                 </div>
-                <div class="form-group col-md-6">
-                    <label for="telefono">Telefono</label>
-                    <input type="number-phone" name="telefono" value="{{$f->telefono}}" class="form-control" placeholder="8888-8888" required="true">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="idPuesto">Puesto Actual: {{$f->idPuesto}}</label>
-                    <select id="idPuesto" name="idPuesto" class="form-control" required="true">     
-                        <option value="{{null}}" selected>Seleccion de otro puesto</option>
-                        @foreach($puesto as $p)
-                        <option value="{{$p->idPuesto}}">{{ $p->nombrePuesto }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="guardar">Confirme para actualizar los datos....</label>
-                    <button type="submit" name="btn" value="editar" class="btn btn-primary form-control bg-dark">Actualizar</button>
-                </div>
-            </div> 
-            </div>
-        </form>
+            </form>
+            @endif
+            
     <!-- Aqui termina -->
     @endforeach
     

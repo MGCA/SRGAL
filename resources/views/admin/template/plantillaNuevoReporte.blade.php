@@ -37,20 +37,6 @@ Nuevo Reporte
             </div>
         </div>
         <div class="card text-center">
-            <div class="card-header" id="headingThree">
-            <h2 class="mb-0">
-                <button class="btn btn-link collapsed text-dark font-weight-bolder" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                Tipo de Acticividad
-                </button>
-            </h2>
-            </div>
-            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
-            <div class="card-body">
-                @yield('TipoDeActividad')
-            </div>
-            </div>
-        </div>
-        <div class="card text-center">
             <div class="card-header" id="headingFour">
             <h2 class="mb-0">
                 <button class="btn btn-link collapsed text-dark font-weight-bolder" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseThree">
