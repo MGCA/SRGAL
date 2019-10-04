@@ -12,6 +12,8 @@ class ReporteController extends Controller
     protected $FuncionesTSQL;
     public function __construct(FuncionesTSQL $FuncionesTSQL){
         $this->FuncionesTSQL = $FuncionesTSQL;
+        //
+        $this->middleware('auth');
     }
 
     public function index(){

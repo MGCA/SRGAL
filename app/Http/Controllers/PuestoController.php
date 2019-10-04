@@ -12,6 +12,9 @@ class PuestoController extends Controller
     protected $FuncionesTSQL;
     public function __construct(FuncionesTSQL $FuncionesTSQL){
         $this->FuncionesTSQL = $FuncionesTSQL;
+        //
+        $this->middleware('auth');
+
     }
 
     public function vista(){

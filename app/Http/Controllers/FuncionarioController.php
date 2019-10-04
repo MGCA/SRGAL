@@ -14,6 +14,8 @@ class FuncionarioController extends Controller
     public function __construct(FuncionesTSQL $FuncionesTSQL)
     {
         $this->FuncionesTSQL = $FuncionesTSQL;
+        //
+        $this->middleware('auth');
     }
 
 
