@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/principal', function () {
+Route::get('/', function () {
     return view('welcome');
 });
 
@@ -73,3 +73,7 @@ Route::get('/NuevoPuesto', function () {
 //Route::post('/create','FuncionarioController@vista');
 //Route::post('/create','FuncionarioController@create');
 
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
