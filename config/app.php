@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('SRGAL', 'Sistema de Registro de la Gestion Ambiental Liberia'),
 
     /*
     |--------------------------------------------------------------------------
