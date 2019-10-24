@@ -15,6 +15,10 @@ class FuncionesTSQL{
     public function crudTipoActividad($idTipoActividad,$nombreActividad,$accion){
         return \DB::select('CALL tipo_actividad_crud(?,?,?)', array($idTipoActividad,$nombreActividad,$accion));
     }//STORE PROCEDURE CRUD de tabla TIPOACTIVIDAD
+    //STORE PROCEDURE CRUD de tabla REPORTE
+    public function crudReporte($aspectoAmbiental, $prioridad, $presupuesto, $fechaInicial, $fechaFinal, $metaAmbiental, $estado, $idReporte, $accion){
+        return \DB::select('CALL reportes_crud(?,?,?,?,?,?,?,?,?)', array($aspectoAmbiental, $prioridad, $presupuesto, $fechaInicial, $fechaFinal, $metaAmbiental, $estado, $idReporte, $accion));
+    }//STORE PROCEDURE CRUD de tabla REPORTE
 
     public function getListarFuncionario(){
         return \DB::select('select * from view_listar_funcionarios');

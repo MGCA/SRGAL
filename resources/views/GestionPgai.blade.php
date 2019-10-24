@@ -1,7 +1,7 @@
 @extends('admin.template.plantillabootstrap')
 
 @section('title')
-Funcionario
+PGAI
 @stop
 
 @section('cabecera')

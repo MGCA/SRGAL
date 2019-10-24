@@ -41,6 +41,18 @@ class ReporteController extends Controller
              return view('mensaje')->with('mensaje', $sql);
          }
 
+         if($request -> btn == 'guardarReporte'){
+            $aspectoAmbiental = $request -> aspectoAmbiental;
+            $prioridad = $request -> prioridad;
+            $presupuesto = $request -> presupuesto;
+            $fechaInicial = $request -> fechaInicial;
+            $fechaFinal = $request -> fechaFinal;
+            $metaAmbiental = $request -> metaAmbiental;
+            $estado = $request -> estado;
+            $sql = $this->FuncionesTSQL->crudReporte($aspectoAmbiental, $prioridad, $presupuesto, $fechaInicial, $fechaFinal, $metaAmbiental, $estado, null, 'nuevo');
+             return view('mensaje')->with('mensaje', $sql);
+         }
+
     }
 
 }
