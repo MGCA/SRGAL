@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Evidencia;
-use Illuminate\Http\Request;
 use App\TSQL\FuncionesTSQL;
+use Illuminate\Http\Request;
+//
+use Dompdf\Dompdf;
 
-class EvidenciaController extends Controller
+class DepartamentoHojasSeguridadController extends Controller
 {
     //
-
     protected $FuncionesTSQL;
     public function __construct(FuncionesTSQL $FuncionesTSQL){
         $this->FuncionesTSQL = $FuncionesTSQL;
@@ -18,9 +18,6 @@ class EvidenciaController extends Controller
     }
 
     public function index(){
-
-        $sql = $this->FuncionesTSQL->crudEvidencia('','','',1,'consultar');
-        return view('srgalListar/VerReporteCompleto')->with('evidencia',$sql);
+        return view('srgalAgregar/DepartamentoHojasSeguridad');
     }
-
 }

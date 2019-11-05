@@ -1,3 +1,5 @@
 @foreach($mensaje as $m)
-        {{$m->mensaje}}
+        Mensaje: {{$m->mensaje}}
+        <br>
+        Nº: {{$m->id}}
 @endforeach

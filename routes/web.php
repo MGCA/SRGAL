@@ -15,6 +15,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//MODULO DepartamentoHojasSeguridad
+
+Route::get('/ModuloSeguridad', 'DepartamentoHojasSeguridadController@index');
 
 
 /*Route::get('/GestionPgai',function(){
@@ -30,6 +33,7 @@ Route::get('/GestionPgai','ReporteController@index');//Vista Gestion Pgai
 Route::get('/GestionFuncionarios','FuncionarioController@index');//Vista Gestion Funcionarios
 Route::get('/NuevoReporte','ReporteController@NuevoReporte');//Vista Nuevo Reporte
 Route::get('/Agregar','PuestoController@getIndex');//Trae el select List de Puestos
+Route::get('/VerReporteCompleto','ReporteController@pdfExportarReporte');
 
 
 
@@ -67,6 +71,9 @@ Route::get('/mensaje', function () {
 Route::get('/NuevoPuesto', function () {
     return view('srgalAgregar/NuevoPuesto');
 });
+//Generar REPORTE PDF
+
+//Generar REPORTE PDF
 
 
 
