@@ -1,12 +1,12 @@
 @extends('admin.template.plantillabootstrap')
 
 @section('title')
-PGAI
+Documentos Generales
 @stop
 
 @section('cabecera')
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a class="navbar-brand font-weight-bold" href="{{('/')}}">PGAI</a>
+    <a class="navbar-brand text-warning font-weight-bold" href="{{('/GestionPgai')}}">PGAI</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" 
       aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -52,58 +52,59 @@ PGAI
 @stop
 
 @section('imagenes')
-<main role="main" class="container">
-  <div class="bd-example">
-    <div id="imagenes" class="carousel slide" data-ride="carousel">
-      <ol class="carousel-indicators">
-        <li data-target="#imagenes" data-slide-to="0" class="active"></li>
-        <li data-target="#imagenes" data-slide-to="1"></li>
-        <li data-target="#imagenes" data-slide-to="2"></li>
-      </ol>
-      <div class="carousel-inner">
-        <div class="carousel-item active" style="height:90vh">
-          <img src="{{ asset('plugins/img/carusel/slider4.jpg')}}" class="d-block w-100" alt="...">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>Responsabilidad</h5>
-            <p>Comprometidos con el ambiente, por un desarrollo sostenible.</p>
-          </div>
-        </div>
-        <div class="carousel-item" style="height:90vh">
-          <img src="{{ asset('plugins/img/carusel/slider1.jpg')}}" class="d-block w-100" alt="...">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>Bandera Azul</h5>
-            <p>Programa de Gestion Ambiental Institucional</p>
-          </div>
-        </div>
-        <div class="carousel-item" style="height:90vh">
-          <img src="{{ asset('plugins/img/carusel/slider2.jpg')}}" class="d-block w-100" alt="...">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>Auditorias</h5>
-            <p>Nuestra evaluacion interna, es necesaria para poder mejorar cada vez mas.</p>
-          </div>
-        </div>
+<div class="container border border-light p-3 text-center">
+   <form action=""><!--Inicio de Formulario Documentos generales -->
+   <p class="h4 mb-4">DOCUMENTOS GENERALES</p>
+   <br>
+    <div class="row">
+      <div class="col-6">
+        <label class="text-center">Nombre del documento</label>
+        <input class=" text-center form-control" type="text" name="nombreDocumentoGeneral" placeholder="ESCRIBA AQUI EL NOMBRE" required>
       </div>
-      <a class="carousel-control-prev" href="#imagenes" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Anterior</span>
-      </a>
-      <a class="carousel-control-next" href="#imagenes" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Siguiente</span>
-      </a>
+      <div class="col-6">
+        <label class="text-center">Tipo de Evidencia</label>
+        <div class="form-control">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="tipoEvidenciaDocumentoGeneral" id="inlineRadio1">
+            <label class="form-check-label" for="inlineRadio1">Proyecto</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="tipoEvidenciaDocumentoGeneral" id="inlineRadio2">
+            <label class="form-check-label" for="inlineRadio2">Formulario</label>
+          </div>
+        </div>
+        
+      </div>
     </div>
-  </div>
-</main>
-  
+    <br>
+    <div class="row">
+      <div class="col-4">
+        <label class="text-center">Fecha de Creacion</label>
+        <input class="text-center form-control" type="date" name="fechaCreacionDocumentoGeneral" required>
+      </div>
+      <div class="col-8">
+        <label class="text-center">Responsable</label>
+        <select class="text-center form-control border-dark" required>
+          <option value="{{null}}" selected>SELECCIONE UN RESPONSABLE</option>
+          <option value="1">One</option>
+          <option value="2">Two</option>
+          <option value="3">Three</option>
+        </select>
+      </div>
+    </div>
+    <br>
+    <div class="border border-light p-3">
+      <p class="h5 mb-4">AÑADIR ARCHIVO O DOCUMENTO</p>
+      <div class="row form-control">
+        <input type="file" name="archivoDocumentoGeneral" required>
+      </div>
+    </div>
+    <br>
+    <button type="submit" class="btn btn-secondary bg-dark">GUARDAR</button>
+    <br>
+  </form>
+  <br>
+</div>
+<br>
+<br>
 @stop
-
-
-
-
-
-
-
-    
-
-
-

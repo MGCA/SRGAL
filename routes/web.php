@@ -20,6 +20,12 @@ Route::get('/', function () {
 Route::get('/ModuloSeguridad', 'DepartamentoHojasSeguridadController@index');
 
 
+//Modulo Gestores Autorizados
+Route::get('/GestoresAutorizados', 'GestoresAutorizadosController@index');
+
+//Modulo Documentos Generales
+Route::get('/DocumentosGenerales', 'DocumentosGeneralesController@index');
+
 /*Route::get('/GestionPgai',function(){
     return view('GestionPgai');
 });*/

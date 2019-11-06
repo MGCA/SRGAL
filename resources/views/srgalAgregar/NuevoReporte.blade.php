@@ -8,16 +8,17 @@
                 <div class="row">
                     <div class="col-6 form-group">
                         <label class="font-weight-bolder">ASPECTO AMBIENTAL</label>
-                        <textarea type="text" class="form-control border-dark" name="aspectoAmbiental" placeholder="Escribir" required></textarea>
+                        <textarea type="text" class="form-control border-dark"style=" height:130px" name="aspectoAmbiental" placeholder="Escribir" required></textarea>
                     </div>
-                    <div class="col-6 form-group">
+                    <div class="col-6 form-group text-center">
                         <label class="font-weight-bolder">PRIODIDAD</label>
                         <select name="prioridad" class="text-center form-control border-dark" required="true">     
-                            <option selected>--SELECCIONE--</option>
+                            <option value="{{null}}" selected>--SELECCIONE--</option>
                             <option >Baja</option>
                             <option >Media</option>
                             <option >Alta</option>
                         </select>
+                        <br>
                         <label class="font-weight-bolder">PRESUPUESTO</label>
                         <input type="text" name="presupuesto" class="form-control text-center" aria-describedby="Cuanto presupuesto ocupa??" placeholder="------MONTO------" required="true">
                     </div>
@@ -47,11 +48,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                        <label class="font-weight-bolder">META AMBIENTAL</label>
-                        <textarea type="text" name="metaAmbiental" class="form-control border-dark" placeholder="Escribir" required></textarea>
+                <div class="form-group text-center">
+                    <label class="font-weight-bolder">CANTIDAD DE META AMBIENTAL</label>
+                    <div class="container align-content-center col-4">
+                        <input type="number" name="metaAmbiental" class="form-control border-dark text-center" required>
+                    </div>
+                    <br>
+                    <button name="btn" value="guardarReporte" class="btn btn-secondary bg-dark" type="submit">Guardar</button>
                 </div>
-                <button name="btn" value="guardarReporte" class="btn btn-secondary bg-dark" type="submit">Guardar</button>
+                
             <hr class="border-warning">
 
         </form>

@@ -1,12 +1,12 @@
 @extends('admin.template.plantillabootstrap')
 
 @section('title')
-PGAI
+Gestores Autorizados
 @stop
 
 @section('cabecera')
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-    <a class="navbar-brand font-weight-bold" href="{{('/')}}">PGAI</a>
+    <a class="navbar-brand text-warning font-weight-bold" href="{{('/GestionPgai')}}">PGAI</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" 
       aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -52,58 +52,63 @@ PGAI
 @stop
 
 @section('imagenes')
-<main role="main" class="container">
-  <div class="bd-example">
-    <div id="imagenes" class="carousel slide" data-ride="carousel">
-      <ol class="carousel-indicators">
-        <li data-target="#imagenes" data-slide-to="0" class="active"></li>
-        <li data-target="#imagenes" data-slide-to="1"></li>
-        <li data-target="#imagenes" data-slide-to="2"></li>
-      </ol>
-      <div class="carousel-inner">
-        <div class="carousel-item active" style="height:90vh">
-          <img src="{{ asset('plugins/img/carusel/slider4.jpg')}}" class="d-block w-100" alt="...">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>Responsabilidad</h5>
-            <p>Comprometidos con el ambiente, por un desarrollo sostenible.</p>
-          </div>
+  <div class="container">
+    <form class="text-center border border-light p-5 " action="#!">
+    <p class="h4 mb-4">GESTORES AUTORIZADOS</p>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label>Nombre de gestor/ Empresa Gestora:</label>
+                <input type="text" class="form-control text-center" placeholder="ESCRIBA EL NOMBRE AQUI">
+            </div>
+            <div class="form-group col-md-6">
+                <label>Telefono:</label>
+                <input type="text" class="form-control text-center" placeholder="506-0000-0000">
+            </div>
         </div>
-        <div class="carousel-item" style="height:90vh">
-          <img src="{{ asset('plugins/img/carusel/slider1.jpg')}}" class="d-block w-100" alt="...">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>Bandera Azul</h5>
-            <p>Programa de Gestion Ambiental Institucional</p>
-          </div>
+        <div class="form-group">
+            <label >Direccion:</label>
+            <input type="text" class="form-control text-center" placeholder="50 ESTE DE LA VUELTA DEL PGAI">
         </div>
-        <div class="carousel-item" style="height:90vh">
-          <img src="{{ asset('plugins/img/carusel/slider2.jpg')}}" class="d-block w-100" alt="...">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>Auditorias</h5>
-            <p>Nuestra evaluacion interna, es necesaria para poder mejorar cada vez mas.</p>
-          </div>
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label >Cedula:</label>
+                <input type="text" class="form-control text-center" placeholder="ID= 0-0000-0000">
+            </div>
+            <div class="form-group col-md-4">
+                <label>Nombre del contacto:</label>
+                <input type="text" class="form-control text-center" placeholder="PRIMER NOMBRE">
+            </div>
+            <div class="form-group col-md-4">
+                <label>Correo:</label>
+                <input type="email" class="form-control text-center" placeholder="ESCRIBIR_MI@CORREO.COM">
+            </div>
         </div>
-      </div>
-      <a class="carousel-control-prev" href="#imagenes" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Anterior</span>
-      </a>
-      <a class="carousel-control-next" href="#imagenes" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Siguiente</span>
-      </a>
-    </div>
+        <br>
+        <div class="row">
+            <div class="form-group col">
+                <label>Tipo de Residuos:</label>
+                <select class="text-center form-control border-dark">
+                    <option value="{{null}}" selected>Open this select menu</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                </select>
+            </div>
+            <div class="align-items-center form-group col">
+                <label>Fecha de Vencimiento de Permiso</label>
+                <input type="date" class="text-center form-control">
+            </div>
+        </div>
+        <div class="border border-light p-3">
+            <label>Adjuntar permiso PDF o IMG:</label>
+            <div class="row form-control">
+                <input type="file" name="ArchivoPermiso">
+            </div>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-secondary bg-dark">GUARDAR</button>
+    </form>
+    <br>
   </div>
-</main>
-  
+  <br>
 @stop
-
-
-
-
-
-
-
-    
-
-
-
