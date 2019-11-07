@@ -102,8 +102,13 @@ class ReporteController extends Controller
         if($request -> btn == 'guardarEvidencia'){
             $idAvance = $request -> idAvance;
             $nombreEvidencia = $request -> nombreEvidencia;
+            if(empty($_FILES['archivo']['tmp_name'])){
+                $archivo = null;
+                $nombreArchivo = null;
+            }else{
             $nombreArchivo = $_FILES["archivo"]["name"];
             $archivo = file_get_contents($_FILES["archivo"]["tmp_name"]);
+            }
             $sql = $this->FuncionesTSQL->crudEvidencia($nombreEvidencia,$archivo,$nombreArchivo,null,$idAvance,'nuevo');
                 //
             //return view('mensaje')->with('mensaje', $sql);

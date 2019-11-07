@@ -18,10 +18,12 @@ Route::get('/', function () {
 //MODULO DepartamentoHojasSeguridad
 
 Route::get('/ModuloSeguridad', 'DepartamentoHojasSeguridadController@index');
+Route::post('/ModuloSeguridad', 'DepartamentoHojasSeguridadController@AccionDepartamentHojasSeguridad');
 
 
 //Modulo Gestores Autorizados
 Route::get('/GestoresAutorizados', 'GestoresAutorizadosController@index');
+Route::post('/GestoresAutorizados', 'GestoresAutorizadosController@AccionGestoresAutorizados');
 
 //Modulo Documentos Generales
 Route::get('/DocumentosGenerales', 'DocumentosGeneralesController@index');

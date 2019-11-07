@@ -35,7 +35,25 @@ class FuncionesTSQL{
     //STORE PROCEDURE CRUD de tabla EVIDENCIAS
     public function crudEvidencia($nombreEvidencia,$archivo,$nombreArchivo,$idEvidencia,$idAvance,$accion){
         return \DB::select('CALL evidencias_crud(?,?,?,?,?,?)', array($nombreEvidencia,$archivo,$nombreArchivo,$idEvidencia,$idAvance,$accion));
-    }//STORE PROCEDURE CRUD de tabla EVIDENCIAS    
+    }//STORE PROCEDURE CRUD de tabla EVIDENCIAS
+    //STORE PROCEDURE CRUD de tabla PRODUCTOS
+    public function crudProducto($nombreProducto,$marca,$codigo,$requiereHojaSeguridad,$archivoHojaSeguridad,$idProducto,$accion){
+        return \DB::select('CALL producto_crud(?,?,?,?,?,?,?)', array($nombreProducto,$marca,$codigo,$requiereHojaSeguridad,$archivoHojaSeguridad,$idProducto,$accion));
+    }//STORE PROCEDURE CRUD de tabla PRODUCTOS
+    //STORE PROCEDURE CRUD de tabla AREASCENTROFORMACION
+    public function crudAreaCentroFormacion($nombreArea,$ubicacion,$idAreasCentroFormacion,$accion){
+        return \DB::select('CALL areas_centro_formacion_crud(?,?,?,?)', array($nombreArea,$ubicacion,$idAreasCentroFormacion,$accion));
+    }//STORE PROCEDURE CRUD de tabla AREASCENTROFORMACION
+    //STORE PROCEDURE CRUD de tabla PRODUCTOAREASCENTROFORMACION
+    public function crudProductoAreaCentroFormacion($idProducto,$idAreasCentroFormacion,$idProductoAreasCentroFormacion,$accion){
+        return \DB::select('CALL producto_areas_centro_formacion_crud(?,?,?,?)', array($idProducto,$idAreasCentroFormacion,$idProductoAreasCentroFormacion,$accion));
+    }//STORE PROCEDURE CRUD de tabla PRODUCTOSAREASCENTROFORMACION
+    //STORE PROCEDURE CRUD de tabla GESTORESAUTORIZADOS
+    public function crudGestoresAutorizados($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$documentoPermiso,$idGestoresAutorizados,$accion){
+        return \DB::select('CALL gestores_autorizados_crud(?,?,?,?,?,?,?,?,?,?,?,?)', array($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$documentoPermiso,$idGestoresAutorizados,$accion));
+    }//STORE PROCEDURE CRUD de tabla GESTORESAUTORIZADOS
+    
+       
 
     //AREA DE VISTAS
     public function getListarFuncionario(){
@@ -58,5 +76,13 @@ class FuncionesTSQL{
     public function getListarAvance(){
         return \DB::select('select * from view_listar_avances');
     }
+    public function getListarProductos(){
+        return \DB::select('select * from view_listar_productos');
+    }
+    public function getListarAreaCentroFormacion(){
+        return \DB::select('select * from view_listar_areas_centro_formacion');
+    }
+    
+
 }
 ?>
