@@ -5,6 +5,13 @@ Documentos Generales
 @stop
 
 @section('cabecera')
+  <script>
+    var msg = '{{Session::get('alert')}}';
+    var exist = '{{Session::has('alert')}}';
+    if(exist){
+      alert(msg);
+    }
+  </script>
   <nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <a class="navbar-brand text-warning font-weight-bold" href="{{('/GestionPgai')}}">PGAI</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" 
@@ -53,23 +60,24 @@ Documentos Generales
 
 @section('imagenes')
 <div class="container border border-light p-3 text-center">
-   <form action=""><!--Inicio de Formulario Documentos generales -->
+   <form enctype="multipart/form-data" action="DocumentosGenerales" method="POST"><!--Inicio de Formulario Documentos generales -->
+   {{ csrf_field()}}
    <p class="h4 mb-4">DOCUMENTOS GENERALES</p>
    <br>
     <div class="row">
       <div class="col-6">
         <label class="text-center">Nombre del documento</label>
-        <input class=" text-center form-control" type="text" name="nombreDocumentoGeneral" placeholder="ESCRIBA AQUI EL NOMBRE" required>
+        <input class=" text-center form-control" type="text" name="nombreDocumento" placeholder="ESCRIBA AQUI EL NOMBRE" required>
       </div>
       <div class="col-6">
         <label class="text-center">Tipo de Evidencia</label>
         <div class="form-control">
           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="tipoEvidenciaDocumentoGeneral" id="inlineRadio1">
+            <input class="form-check-input" type="radio" name="tipoEvidencia" id="inlineRadio1">
             <label class="form-check-label" for="inlineRadio1">Proyecto</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="tipoEvidenciaDocumentoGeneral" id="inlineRadio2">
+            <input class="form-check-input" type="radio" name="tipoEvidencia" id="inlineRadio2">
             <label class="form-check-label" for="inlineRadio2">Formulario</label>
           </div>
         </div>
@@ -80,16 +88,11 @@ Documentos Generales
     <div class="row">
       <div class="col-4">
         <label class="text-center">Fecha de Creacion</label>
-        <input class="text-center form-control" type="date" name="fechaCreacionDocumentoGeneral" required>
+        <input class="text-center form-control" type="date" name="fechaCreacion" required>
       </div>
       <div class="col-8">
         <label class="text-center">Responsable</label>
-        <select class="text-center form-control border-dark" required>
-          <option value="{{null}}" selected>SELECCIONE UN RESPONSABLE</option>
-          <option value="1">One</option>
-          <option value="2">Two</option>
-          <option value="3">Three</option>
-        </select>
+        <input class=" text-center form-control" type="text" name="idResponsable" placeholder="RESPONSABLE" required>
       </div>
     </div>
     <br>
@@ -100,7 +103,7 @@ Documentos Generales
       </div>
     </div>
     <br>
-    <button type="submit" class="btn btn-secondary bg-dark">GUARDAR</button>
+    <button type="submit" name="btn" value="guardarDocumentosGenerales" class="btn btn-secondary bg-dark">GUARDAR</button>
     <br>
   </form>
   <br>

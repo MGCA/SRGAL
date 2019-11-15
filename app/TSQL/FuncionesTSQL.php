@@ -52,6 +52,10 @@ class FuncionesTSQL{
     public function crudGestoresAutorizados($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$documentoPermiso,$idGestoresAutorizados,$accion){
         return \DB::select('CALL gestores_autorizados_crud(?,?,?,?,?,?,?,?,?,?,?,?)', array($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$documentoPermiso,$idGestoresAutorizados,$accion));
     }//STORE PROCEDURE CRUD de tabla GESTORESAUTORIZADOS
+    //STORE PROCEDURE CRUD de tabla DOCUMENTOSGENERALES
+    public function crudDocumentosGenerales($nombreDocumento,$tipoEvidencia,$fechaCreacion,$archivoDocumentoGeneral,$idResponsable,$idDocumentosGenerales,$accion){
+        return \DB::select('CALL documentos_generales_crud(?,?,?,?,?,?,?)', array($nombreDocumento,$tipoEvidencia,$fechaCreacion,$archivoDocumentoGeneral,$idResponsable,$idDocumentosGenerales,$accion));
+    }//STORE PROCEDURE CRUD de tabla DOCUMENTOSGENERALES
     
        
 

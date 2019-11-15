@@ -1,0 +1,1308 @@
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+DROP DATABASE IF EXISTS `sistema_de_gestion_ambiental`;
+CREATE DATABASE IF NOT EXISTS `sistema_de_gestion_ambiental` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `sistema_de_gestion_ambiental`;
+
+DROP TABLE IF EXISTS `actividadambiental`;
+CREATE TABLE IF NOT EXISTS `actividadambiental` (
+  `idActividadAmbiental` int(11) NOT NULL AUTO_INCREMENT,
+  `descripcionActividadAmbiental` varchar(100) NOT NULL,
+  `indicador` varchar(45) NOT NULL,
+  `recurso` varchar(45) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idActividadAmbiental`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `actividadambientalobjetivo`;
+CREATE TABLE IF NOT EXISTS `actividadambientalobjetivo` (
+  `idActividadAmbientalObjetivo` int(11) NOT NULL AUTO_INCREMENT,
+  `idActividadAmbiental` int(11) NOT NULL,
+  `idObjetivo` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idActividadAmbientalObjetivo`),
+  KEY `FK_ActividadAmbiental_AAO` (`idActividadAmbiental`),
+  KEY `FK_Objetivo_AAO` (`idObjetivo`),
+  CONSTRAINT `FK_ActividadAmbiental_AAO` FOREIGN KEY (`idActividadAmbiental`) REFERENCES `actividadambiental` (`idActividadAmbiental`),
+  CONSTRAINT `FK_Objetivo_AAO` FOREIGN KEY (`idObjetivo`) REFERENCES `objetivo` (`idObjetivo`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `actividadambientalreporte`;
+CREATE TABLE IF NOT EXISTS `actividadambientalreporte` (
+  `idActividadAmbientalReporte` int(11) NOT NULL AUTO_INCREMENT,
+  `idReporte` int(11) NOT NULL,
+  `idActividadAmbiental` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idActividadAmbientalReporte`),
+  KEY `FK_Reporte_ActAmbRep` (`idReporte`),
+  KEY `FK_ActividadAmbiental_ActAmbRep` (`idActividadAmbiental`),
+  CONSTRAINT `FK_ActividadAmbiental_ActAmbRep` FOREIGN KEY (`idActividadAmbiental`) REFERENCES `actividadambiental` (`idActividadAmbiental`),
+  CONSTRAINT `FK_Reporte_ActAmbRep` FOREIGN KEY (`idReporte`) REFERENCES `reporte` (`idReporte`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `actividadambientaltipoactividad`;
+CREATE TABLE IF NOT EXISTS `actividadambientaltipoactividad` (
+  `idActividadAmbientalTipoActividad` int(11) NOT NULL AUTO_INCREMENT,
+  `idActividadAmbiental` int(11) DEFAULT NULL,
+  `idTipoActividad` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idActividadAmbientalTipoActividad`),
+  KEY `FK_ActividadAmbientalTipoActividad_ActividadAmbiental` (`idActividadAmbiental`),
+  KEY `FK_ActividadAmbientalTipoActividad_TipoActividad` (`idTipoActividad`),
+  CONSTRAINT `FK_ActividadAmbientalTipoActividad_ActividadAmbiental` FOREIGN KEY (`idActividadAmbiental`) REFERENCES `actividadambiental` (`idActividadAmbiental`),
+  CONSTRAINT `FK_ActividadAmbientalTipoActividad_TipoActividad` FOREIGN KEY (`idTipoActividad`) REFERENCES `tipoactividad` (`idTipoActividad`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `actividad_ambiental_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `actividad_ambiental_crud`(
+in pDescripcionActividadAmbiental varchar(100),
+in pIndicador varchar(45),
+in pRecurso varchar(45),
+in pIdActividadAmbiental int,
+in pIdReporte int,
+in accion varchar(45)
+)
+BEGIN
+	case accion
+		/* Espacio de INSERT*/
+		when 'nuevo' then
+			IF !EXISTS(select descripcionActividadAmbiental, indicador, recurso from actividadambiental 
+            where descripcionActividadAmbiental = pDescripcionActividadAmbiental and indicador = pIndicador 
+            and recurso = pRecurso) then
+				insert into actividadambiental(descripcionActividadAmbiental, indicador, recurso,created_at,updated_at)
+					values (pDescripcionActividadAmbiental, pIndicador, pRecurso,now(),now());
+				COMMIT;
+                /*If para llenar tabla intermedia*/
+					if exists(select aspectoAmbiental from reporte where idReporte = pIdReporte) then
+						insert into actividadambientalreporte(idReporte,idActividadAmbiental,created_at,updated_at)
+							values (pIdReporte,@@identity,now(),now());
+					end if;
+                select 'Actividad Ambiental guardada correctamente' as mensaje, @@identity AS id;
+                
+			ELSE
+				select 'La Actividad Ambiental a guardar Ya existe' as mensaje, 'error' AS id;
+            END IF;
+            
+		/* Espacio de UPDATE*/
+			when 'editar' then
+				IF (pIdActividadAmbiental != '') then
+					IF EXISTS(select idActividadAmbiental from actividadambiental where idActividadAmbiental = pIdActividadAmbiental) then
+						update actividadambiental set
+						descripcionActividadAmbiental = pDescripcionActividadAmbiental, indicador = pIndicador,
+						recurso = pRecurso, idActividadAmbiental = pIdActividadAmbiental, updated_at = now()
+						where idActividadAmbiental = pIdActividadAmbiental;
+						COMMIT;
+						select 'Los datos se actualizaron correctamente' as mensaje;
+					ELSE
+						select 'No existe la Actividad Ambiental verifiquelo' as mensaje;
+					END IF;
+				ELSE
+					select 'No se puede continuar, un campo esta vacio' as mensaje;
+				END IF;
+				
+		/* Espacio de DELETE*/
+			when 'borrar' then
+				IF EXISTS(select idActividadAmbiental from actividadambiental where idActividadAmbiental = pIdActividadAmbiental) then
+					delete from actividadambiental where idActividadAmbiental = pIdActividadAmbiental;
+					COMMIT;
+					select 'Actividad Ambiental Borrada con exito' as mensaje;
+				ELSE
+					select 'No existe la Actividad Ambiental a borrar' as mensaje;
+				END IF;
+                
+			/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idActividadAmbiental from actividadambiental where idActividadAmbiental = pIdActividadAmbiental) then
+				select * from actividadambiental where idActividadAmbiental = pIdActividadAmbiental;
+			ELSE
+				select 'No existe la Actividad Ambiental!!!' as mensaje;
+            END IF;
+
+	end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `areascentroformacion`;
+CREATE TABLE IF NOT EXISTS `areascentroformacion` (
+  `idAreasCentroFormacion` int(11) NOT NULL AUTO_INCREMENT,
+  `nombreArea` varchar(100) NOT NULL,
+  `ubicacion` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idAreasCentroFormacion`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `areas_centro_formacion_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `areas_centro_formacion_crud`(
+in pNombreArea varchar(100),
+in pUbicacion varchar(100),
+in pIdAreasCentroFormacion int,
+in accion varchar(45)
+)
+BEGIN
+	case accion
+		when 'nuevo' then
+			if (pNombreArea != '' and pUbicacion != '') then
+				IF !EXISTS(select nombreArea, ubicacion from areascentroformacion where nombreArea = pNombreArea and ubicacion = pUbicacion) then
+					insert into areascentroformacion(nombreArea,ubicacion,created_at,updated_at)
+						values (pNombreArea, pUbicacion,now(),now());
+					COMMIT;
+						select 'Area Centro de Formacion guardado correctamente' as mensaje, @@identity AS id;
+					ELSE
+						select 'El Area Centro de Formacion a guardar Ya existe' as mensaje, 'error' AS id;
+					END IF;
+			else
+				select 'Revise los campos: Nombre del Area o Ubicacion que esten *llenos*' as mensaje;
+			end if;
+                
+		/* Espacio de UPDATE*/
+        when 'editar' then
+			IF (pIdAreasCentroFormacion != '') then
+				IF EXISTS(select idAreasCentroFormacion from areascentroformacion where idAreasCentroFormacion = pIdAreasCentroFormacion) then
+					update areascentroformacion set
+					nombreArea = pNombreArea, ubicacion = pUbicacion, updated_at = now()
+					where idAreasCentroFormacion = pIdAreaCentroFormacion;
+					COMMIT;
+					select 'Los datos se actualizaron correctamente' as mensaje;
+				ELSE
+					select 'No existe el Area Centro de Formacion verifiquelo' as mensaje;
+				END IF;
+			ELSE
+				select 'No se puede continuar, un campo esta vacio' as mensaje;
+			END IF;
+            
+        /* Espacio de DELETE*/
+		when 'borrar' then
+			IF EXISTS(select idAreasCentroFormacion from areascentroformacion where idAreasCentroFormacion = pIdAreasCentroFormacion) then
+				delete from areascentroformacion where idAreasCentroFormacion = pIdAreasCentroFormacion;
+				COMMIT;
+                select 'Area Centro de Formacion Borrado con exito' as mensaje;
+            ELSE
+				select 'No existe el Area Centro de Formacion a borrar' as mensaje;
+            END IF;
+            
+		/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idAreasCentroFormacion from areascentroformacion where idAreasCentroFormacion = pIdAreasCentroFormacion) then
+				select * from areascentroformacion where idAreasCentroFormacion = pIdAreasCentroFormacion;
+			ELSE
+				select 'No existe el Area Centro de Formacion' as mensaje;
+            END IF;
+    end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `avance`;
+CREATE TABLE IF NOT EXISTS `avance` (
+  `idAvance` int(11) NOT NULL AUTO_INCREMENT,
+  `descripcionAvance` varchar(200) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idAvance`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `avances_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `avances_crud`(
+in pDescripcionAvance varchar(200),
+in pIdAvance int,
+in pIdTipoActividad int,
+in accion varchar(45)
+)
+BEGIN
+	case accion
+		when 'nuevo' then
+			IF !EXISTS(select descripcionAvance from avance where descripcionAvance = pDescripcionAvance) then
+				insert into avance(descripcionAvance,created_at,updated_at)
+					values (pDescripcionAvance,now(),now());
+				COMMIT;
+                /*If para llenar tabla intermedia*/
+					if exists(select nombreActividad from tipoactividad where idTipoActividad = pIdTipoActividad) then
+						insert into tipoactividadavance(idTipoActividad,idAvance,created_at,updated_at)
+							values (pIdTipoActividad,@@identity,now(),now());
+					end if;
+					select 'Avance guardado correctamente' as mensaje, @@identity AS id;
+				ELSE
+					select 'El Avance a guardar Ya existe' as mensaje, 'error' AS id;
+				END IF;
+                
+		/* Espacio de UPDATE*/
+        when 'editar' then
+			IF (pIdAvance != '') then
+				IF EXISTS(select idAvance from avance where idAvance = pIdAvance) then
+					update avance set
+					descripcionAvance = pDescripcionAvance, updated_at = now()
+					where idAvance = pIdAvance;
+					COMMIT;
+					select 'Los datos se actualizaron correctamente' as mensaje;
+				ELSE
+					select 'No existe el Avance verifiquelo' as mensaje;
+				END IF;
+			ELSE
+				select 'No se puede continuar, un campo esta vacio' as mensaje;
+			END IF;
+            
+        /* Espacio de DELETE*/
+		when 'borrar' then
+			IF EXISTS(select idAvance from avance where idAvance = pIdAvance) then
+				delete from avance where idAvance = pIdAvance;
+				COMMIT;
+                select 'Avance Borrado con exito' as mensaje;
+            ELSE
+				select 'No existe el Avance a borrar' as mensaje;
+            END IF;
+            
+		/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idAvance from avance where idAvance = pIdAvance) then
+				select * from avance where idAvance = pIdAvance;
+			ELSE
+				select 'No existe el Avance' as mensaje;
+            END IF;
+    end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `documentosgenerales`;
+CREATE TABLE IF NOT EXISTS `documentosgenerales` (
+  `idDocumentosGenerales` int(11) NOT NULL AUTO_INCREMENT,
+  `nombreDocumento` varchar(30) NOT NULL,
+  `tipoEvidencia` varchar(20) NOT NULL,
+  `fechaCreacion` date NOT NULL,
+  `archivoDocumentoGeneral` longblob NOT NULL,
+  `idResponsable` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idDocumentosGenerales`),
+  KEY `FK_Funcionarios_DocumentosGenerales` (`idResponsable`),
+  CONSTRAINT `FK_Funcionarios_DocumentosGenerales` FOREIGN KEY (`idResponsable`) REFERENCES `funcionario` (`idFuncionario`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `documentos_generales_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `documentos_generales_crud`(
+    in pNombreDocumento varchar(30),
+	in pTipoEvidencia varchar(20),
+    in pFechaCreacion date,
+	in pArchivoDocumentoGeneral longblob,
+    in pIdResponsable int,
+    in pIdDocumentosGenerales int,
+	in accion varchar(45)
+)
+BEGIN
+	case accion
+		/* Espacio de INSERT*/
+		when 'nuevo' then
+			IF(pFechaCreacion is not null and pTipoEvidencia != '' and pNombreDocumento != '') then
+				IF EXISTS(select * from funcionario where idFuncionario = pIdResponsable) then
+					insert into documentosgenerales(nombreDocumento, tipoEvidencia, fechaCreacion, archivoDocumentoGeneral, idResponsable, created_at,updated_at)
+						values (pNombreDocumento, pTipoEvidencia, pFechaCreacion, pArchivoDocumentoGeneral, pIdResponsable,now(),now());
+					COMMIT;
+					select 'El Documento General se ha guardado correctamente' as mensaje, @@identity AS id;
+				ELSE 
+					select CONCAT('El Responsable indicado no es un funcionario id:',pIdResponsable,', error') as mensaje;
+				END IF;
+			else
+				select 'Verifique los campos archivo, tipo evidencia, nombre documento, que esten *llenos*' as mensaje;
+			end if;
+            
+		/* Espacio de UPDATE*/
+			when 'editar' then
+				IF (pIdDocumentosGenerales != '') then
+					IF EXISTS(select idDocumentosGenerales from documentosgenerales where idDocumentosGenerales = pIdDocumentosGenerales) then
+						update documentosgenerales set
+						nombreDocumento = pNombreDocumento, tipoEvidencia = pTipoEvidencia, fechaCreacion = pFechaCreacion, archivoDocumentoGeneral = pArchivoDocumentoGeneral, 
+						idResponsable = pIdResponsable, updated_at = now()
+						where idDocumentosGenerales = pIdDocumentosGenerales;
+						COMMIT;
+						select 'Los datos se actualizaron correctamente' as mensaje;
+					ELSE
+						select 'No existe el Documento General verifiquelo' as mensaje;
+					END IF;
+				ELSE
+					select 'No se puede continuar, un campo esta vacio' as mensaje;
+				END IF;
+				
+		/* Espacio de DELETE*/
+			when 'borrar' then
+				IF EXISTS(select idDocumentosGenerales from documentosgenerales where idDocumentosGenerales = pIdDocumentosGenerales) then
+					delete from documentosgenerales where idDocumentosGenerales = pIdDocumentosGenerales;
+					COMMIT;
+					select 'Documento General, Borrado con exito' as mensaje;
+				ELSE
+					select 'No existe el Documento General a borrar' as mensaje;
+				END IF;
+                
+			/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idDocumentosGenerales from documentosgenerales where idDocumentosGenerales = pIdDocumentosGenerales) then
+				select * from documentosgenerales where idDocumentosGenerales = pIdDocumentosGenerales;
+			ELSE
+				select 'No existe el Documento General!!!' as mensaje;
+            END IF;
+
+	end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `evidencia`;
+CREATE TABLE IF NOT EXISTS `evidencia` (
+  `idEvidencia` int(11) NOT NULL AUTO_INCREMENT,
+  `nombreEvidencia` varchar(100) NOT NULL,
+  `archivo` longblob DEFAULT NULL,
+  `nombreArchivo` varchar(45) DEFAULT NULL,
+  `idGestoresAutorizados` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idEvidencia`),
+  KEY `FK_GestoresAutorizados_Evidencia` (`idGestoresAutorizados`),
+  CONSTRAINT `FK_GestoresAutorizados_Evidencia` FOREIGN KEY (`idGestoresAutorizados`) REFERENCES `gestoresautorizados` (`idGestoresAutorizados`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `evidenciaavance`;
+CREATE TABLE IF NOT EXISTS `evidenciaavance` (
+  `idEvidenciaAvance` int(11) NOT NULL AUTO_INCREMENT,
+  `idEvidencia` int(11) DEFAULT NULL,
+  `idAvance` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idEvidenciaAvance`),
+  KEY `FK_EvidenciaAvance_Avance` (`idAvance`),
+  KEY `FK_EvidenciaAvance_Evidencia` (`idEvidencia`),
+  CONSTRAINT `FK_EvidenciaAvance_Avance` FOREIGN KEY (`idAvance`) REFERENCES `avance` (`idAvance`),
+  CONSTRAINT `FK_EvidenciaAvance_Evidencia` FOREIGN KEY (`idEvidencia`) REFERENCES `evidencia` (`idEvidencia`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `evidencias_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `evidencias_crud`(
+in pNombreEvidencia varchar(100),
+in pArchivo longblob,
+in pNombreArchivo varchar(45),
+in pIdEvidencia int,
+in pIdAvance int,
+in accion varchar(45)
+)
+BEGIN
+	case accion
+		
+        /* Espacio de INSERT */
+        when 'nuevo' then
+			IF !EXISTS(select nombreArchivo from evidencia where nombreArchivo = pNombreArchivo) then
+				insert into evidencia(nombreEvidencia,archivo,nombreArchivo,created_at,updated_at) 
+					values(pNombreEvidencia,pArchivo,pNombreArchivo,now(),now());
+					COMMIT;
+                    /*If para llenar tabla intermedia*/
+					if exists(select descripcionAvance from avance where idAvance = pIdAvance) then
+						insert into evidenciaavance(idEvidencia,idAvance,created_at,updated_at)
+							values (@@identity,pIdAvance,now(),now());
+					end if;
+						select 'Evidencia guardado correctamente' as mensaje, @@identity AS id;
+					ELSE
+						select 'La Evidencia a guardar Ya existe' as mensaje, 'error' AS id;
+					END IF;
+                
+		/* Espacio de UPDATE*/
+        when 'editar' then
+			IF (pIdEvidencia != '') then
+				IF EXISTS(select idEvidencia from evidencia where idEvidencia = pIdEvidencia) then
+					update evidencia set
+					nombreEvidencia = pNombreEvidencia, archivo = pArchivo, nombreArchivo = pNombreArchivo, updated_at = now()
+					where idEvidencia = pIdEvidencia;
+					COMMIT;
+					select 'Los datos se actualizaron correctamente' as mensaje;
+				ELSE
+					select 'No existe la Evidencia verifiquelo' as mensaje;
+				END IF;
+			ELSE
+				select 'No se puede continuar, un campo esta vacio' as mensaje;
+			END IF;
+            
+		/* Espacio de DELETE*/
+		when 'borrar' then
+			IF EXISTS(select idEvidencia from evidencia where idEvidencia = pIdEvidencia) then
+				delete from evidencia where idEvidencia = pIdEvidencia;
+				COMMIT;
+                select 'Evidencia Borrado con exito' as mensaje;
+            ELSE
+				select 'No existe la Evidencia a borrar' as mensaje;
+            END IF;
+            
+		/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idEvidencia from evidencia where idEvidencia = pIdEvidencia) then
+				select * from evidencia where idEvidencia = pIdEvidencia;
+			ELSE
+				select 'No existe la Evidencia' as mensaje;
+            END IF;
+	end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `funcionario`;
+CREATE TABLE IF NOT EXISTS `funcionario` (
+  `idFuncionario` int(11) NOT NULL AUTO_INCREMENT,
+  `cedula` int(11) NOT NULL,
+  `nombre` varchar(45) NOT NULL,
+  `priApellido` varchar(45) NOT NULL,
+  `segApellido` varchar(45) NOT NULL,
+  `correo` varchar(100) NOT NULL,
+  `telefono` varchar(100) NOT NULL,
+  `idPuesto` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idFuncionario`),
+  UNIQUE KEY `cedula` (`cedula`),
+  KEY `FK_Puesto_Funcionario` (`idPuesto`),
+  CONSTRAINT `FK_Puesto_Funcionario` FOREIGN KEY (`idPuesto`) REFERENCES `puesto` (`idPuesto`)
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `funcionarioinformaciongeneralreporte`;
+CREATE TABLE IF NOT EXISTS `funcionarioinformaciongeneralreporte` (
+  `idFunInfGenRep` int(11) NOT NULL AUTO_INCREMENT,
+  `idInformacionGeneralReporte` int(11) NOT NULL,
+  `idFuncionario` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idFunInfGenRep`),
+  KEY `FK_Funcionarios_FUNINFGENREP` (`idInformacionGeneralReporte`),
+  KEY `FK_InfGenRep_Funcionario` (`idFuncionario`),
+  CONSTRAINT `FK_Funcionarios_FUNINFGENREP` FOREIGN KEY (`idInformacionGeneralReporte`) REFERENCES `informaciongeneralreporte` (`idInformacionGeneralReporte`),
+  CONSTRAINT `FK_InfGenRep_Funcionario` FOREIGN KEY (`idFuncionario`) REFERENCES `funcionario` (`idFuncionario`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `funcionarios_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `funcionarios_crud`(
+	in pCedula int,
+	in pNombre varchar(45),
+	in pPriApellido varchar(45),
+	in pSegApellido varchar(45),
+	in pCorreo varchar(100),
+	in pTelefono varchar(100),
+	in pIdPuesto int,
+	in accion varchar(40)
+)
+BEGIN
+	case accion
+		/* Espacio de INSERT*/
+		when 'nuevo' then
+			IF !EXISTS(select cedula from funcionario where cedula = pCedula) then
+				insert into funcionario(cedula,nombre,priApellido,segApellido,correo,telefono,idPuesto,created_at,updated_at)
+					values (pCedula,pNombre,pPriApellido,pSegApellido,pCorreo,pTelefono,pIdPuesto,now(),now());
+				COMMIT;
+                select 'Funcionario guardado correctamente' as mensaje, @@identity AS id;
+			ELSE
+				select 'El Funcionario a guardar Ya existe' as mensaje, 'error' AS id;
+            END IF;
+            
+		/* Espacio de UPDATE*/
+        when 'editar' then
+			IF (pCedula != '' and pNombre != '' and pPriApellido != '' and pSegApellido != '' and pCorreo != '' and pTelefono != '') then
+				IF EXISTS(select cedula from funcionario where cedula = pCedula) then
+					update funcionario set
+					nombre = pNombre, priApellido = pPriApellido, segApellido = pSegApellido, correo = pCorreo, telefono = pTelefono, idPuesto = pIdPuesto, updated_at = now()
+					where cedula = pCedula;
+					COMMIT;
+					select 'Los datos se actualizaron correctamente' as mensaje;
+				ELSE
+					select 'No existe el Funcionario verifiquelo' as mensaje;
+				END IF;
+			ELSE
+				select 'No se puede continuar, un campo esta vacio' as mensaje;
+			END IF;
+		/* Espacio de DELETE*/
+		when 'borrar' then
+			IF EXISTS(select cedula from funcionario where cedula = pCedula) then
+				delete from funcionario where cedula = pCedula;
+				COMMIT;
+                select 'Funcionario Borrado con exito' as mensaje;
+            ELSE
+				select 'No existe el funcionario a borrar' as mensaje;
+            END IF;
+		/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select cedula from funcionario where cedula = pCedula) then
+				select idFuncionario,cedula,nombre,priApellido,segApellido,correo,telefono,nombrePuesto as'idPuesto' from funcionario as f inner join puesto as p on f.idPuesto=p.idPuesto  where cedula = pCedula;
+			ELSE
+				select 'No existe el funcionario' as mensaje;
+            END IF;
+	end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `gestoresautorizados`;
+CREATE TABLE IF NOT EXISTS `gestoresautorizados` (
+  `idGestoresAutorizados` int(11) NOT NULL AUTO_INCREMENT,
+  `nombreGestor` varchar(45) NOT NULL,
+  `telefonoGestor` varchar(15) DEFAULT NULL,
+  `direccionGestor` varchar(100) NOT NULL,
+  `nombreContacto` varchar(100) NOT NULL,
+  `telefonoContacto` varchar(15) NOT NULL,
+  `correoContacto` varchar(100) NOT NULL,
+  `cedulaContacto` int(11) DEFAULT NULL,
+  `tipoResiduo` varchar(100) NOT NULL,
+  `fechaVencimientoPermiso` date NOT NULL,
+  `documentoPermiso` longblob DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idGestoresAutorizados`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `gestores_autorizados_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `gestores_autorizados_crud`(
+	in pNombreGestor varchar(45),
+	in pTelefonoGestor varchar(15),
+	in pDireccionGestor varchar(100),
+	in pNombreContacto varchar(100),
+	in pTelefonoContacto varchar(15),
+	in pCorreoContacto varchar(100),
+    in pCedulaContacto varchar(15),
+	in pTipoResiduo varchar(100),
+	in pFechaVencimientoPermiso date,
+	in pDocumentoPermiso longblob,
+    in pIdGestoresAutorizados int,
+	in accion varchar(45)
+)
+BEGIN
+	case accion
+		/* Espacio de INSERT*/
+		when 'nuevo' then
+			if(pNombreGestor != '' and pDireccionGestor != '' and pNombreContacto  != '' and pTelefonoContacto  != '' and pCorreoContacto  != '' and pTipoResiduo  != '' and pFechaVencimientoPermiso is not null) then
+				IF !EXISTS(select nombreGestor from gestoresautorizados 
+				where nombreGestor = pNombreGestor and direccionGestor = pDireccionGestor) then
+					insert into gestoresautorizados(nombreGestor, telefonoGestor, direccionGestor, nombreContacto, telefonoContacto, correoContacto, cedulaContacto, tipoResiduo, fechaVencimientoPermiso, documentoPermiso, created_at,updated_at)
+						values (pNombreGestor, pTelefonoGestor, pDireccionGestor, pNombreContacto, pTelefonoContacto, pCorreoContacto, pCedulaContacto, pTipoResiduo, pFechaVencimientoPermiso, pDocumentoPermiso,now(),now());
+					COMMIT;
+					select 'El Gestor Autorizado se ha guardado correctamente' as mensaje, @@identity AS id;
+					
+				ELSE
+					select 'El Gestor Autorizado a guardar Ya existe' as mensaje, 'error' AS id;
+				END IF;
+			else
+				select 'Verifique los campos NombreGestor, Direccion Gestor, Nombre Contacto, Correo o Tipo Residuo , que esten *llenos*' as mensaje;
+			end if;
+            
+		/* Espacio de UPDATE*/
+			when 'editar' then
+				IF (pIdGestoresAutorizados != '') then
+					IF EXISTS(select idGestoresAurizados from gestoresautorizados where idGestoresAutorizados = pIdGestoresAutorizados) then
+						update gestoresautorizados set
+						nombreGestor = pNombreGestor, telefonoGestor = pTelefonoGestor, direccionGestor = pDireccionGestor, nombreContacto = pNombreContacto, 
+                        telefonoContacto = pTelefonoContacto, correoContacto = pCorreoContacto, cedulaContacto = pCedulaContacto, tipoResiduo = pTipoResiduo, fechaVencimientoPermiso = pFechaVencimientoPermiso, 
+                        documentoPermiso = pDocumentoPermiso, updated_at = now()
+						where idGestoresAutorizados = pIdGestoresAutorizados;
+						COMMIT;
+						select 'Los datos se actualizaron correctamente' as mensaje;
+					ELSE
+						select 'No existe el Gestor Autorizado verifiquelo' as mensaje;
+					END IF;
+				ELSE
+					select 'No se puede continuar, un campo esta vacio' as mensaje;
+				END IF;
+				
+		/* Espacio de DELETE*/
+			when 'borrar' then
+				IF EXISTS(select idGestoresAutorizados from gestoresautorizados where idGestoresAutorizados = pIdGestoresAutorizados) then
+					delete from gestoresautorizados where idGestoresAutorizados = pIdGestoresAutorizados;
+					COMMIT;
+					select 'Gestor Autorizado, Borrado con exito' as mensaje;
+				ELSE
+					select 'No existe el Gestor Autorizado a borrar' as mensaje;
+				END IF;
+                
+			/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idGestoresAutorizados from gestoresautorizados where idGestoresAutorizados = pIdGestoresAutorizados) then
+				select * from gestoresautorizados where idGestoresAutorizados = pIdGestoresAutorizados;
+			ELSE
+				select 'No existe el Gestor Autorizado!!!' as mensaje;
+            END IF;
+
+	end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `informaciongeneralreporte`;
+CREATE TABLE IF NOT EXISTS `informaciongeneralreporte` (
+  `idInformacionGeneralReporte` int(11) NOT NULL AUTO_INCREMENT,
+  `fechaGenerado` date NOT NULL,
+  `idReporte` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idInformacionGeneralReporte`),
+  KEY `FK_Reporte_InfGenRep` (`idReporte`),
+  CONSTRAINT `FK_Reporte_InfGenRep` FOREIGN KEY (`idReporte`) REFERENCES `reporte` (`idReporte`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `migrations`;
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `objetivo`;
+CREATE TABLE IF NOT EXISTS `objetivo` (
+  `idObjetivo` int(11) NOT NULL AUTO_INCREMENT,
+  `descripcionObjetivo` varchar(100) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idObjetivo`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `objetivos_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `objetivos_crud`(
+in pDescripcionObjetivo varchar(100),
+in pIdObjetivo int,
+pIdActividadAmbiental int,
+in accion varchar(45)
+)
+BEGIN
+	case accion
+		when 'nuevo' then
+			IF !EXISTS(select descripcionObjetivo from objetivo where descripcionObjetivo = pDescripcionObjetivo) then
+				insert into objetivo(descripcionObjetivo,created_at,updated_at)
+					values (pDescripcionObjetivo,now(),now());
+				COMMIT;
+					/*If para llenar tabla intermedia*/
+					if exists(select descripcionActividadAmbiental from actividadambiental where idActividadAmbiental = pIdActividadAmbiental) then
+						insert into actividadambientalobjetivo(idActividadAmbiental,idObjetivo,created_at,updated_at)
+							values (pIdActividadAmbiental,@@identity,now(),now());
+					end if;
+					select 'Objetivo guardado correctamente' as mensaje, @@identity AS id;
+				ELSE
+					select 'El Objetivo a guardar Ya existe' as mensaje, 'error' AS id;
+				END IF;
+                
+		/* Espacio de UPDATE*/
+        when 'editar' then
+			IF (pIdObjetivo != '') then
+				IF EXISTS(select idObjetivo from objetivo where idObjetivo = pIdObjetivo) then
+					update objetivo set
+					descripcionObjetivo = pDescripcionObjetivo, updated_at = now()
+					where idObjetivo = pIdObjetivo;
+					COMMIT;
+					select 'Los datos se actualizaron correctamente' as mensaje;
+				ELSE
+					select 'No existe el Objetivo verifiquelo' as mensaje;
+				END IF;
+			ELSE
+				select 'No se puede continuar, un campo esta vacio' as mensaje;
+			END IF;
+            
+        /* Espacio de DELETE*/
+		when 'borrar' then
+			IF EXISTS(select idObjetivo from objetivo where idObjetivo = pIdObjetivo) then
+				delete from objetivo where idObjetivoo = pIdObjetivo;
+				COMMIT;
+                select 'Objetivo Borrado con exito' as mensaje;
+            ELSE
+				select 'No existe el Objetivo a borrar' as mensaje;
+            END IF;
+            
+		/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idObjetivo from objetivo where idObjetivo = pIdObjetivo) then
+				select * from objetivo where idObjetivo = pIdObjetivo;
+			ELSE
+				select 'No existe el Objetivo' as mensaje;
+            END IF;
+    end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `password_resets`;
+CREATE TABLE IF NOT EXISTS `password_resets` (
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  KEY `password_resets_email_index` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `productos`;
+CREATE TABLE IF NOT EXISTS `productos` (
+  `idProducto` int(11) NOT NULL AUTO_INCREMENT,
+  `nombreProducto` varchar(100) NOT NULL,
+  `marca` varchar(100) NOT NULL,
+  `codigo` varchar(100) DEFAULT NULL,
+  `requiereHojaSeguridad` tinyint(4) NOT NULL,
+  `archivoHojaSeguridad` longblob DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idProducto`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `productosareascentroformacion`;
+CREATE TABLE IF NOT EXISTS `productosareascentroformacion` (
+  `idProductoAreasCentroFormacion` int(11) NOT NULL AUTO_INCREMENT,
+  `idProducto` int(11) DEFAULT NULL,
+  `idAreasCentroFormacion` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idProductoAreasCentroFormacion`),
+  KEY `FK_Productos_ProductosAreasCentroFormacion` (`idProducto`),
+  KEY `FK_AreasCentroFormacion_ProductosAreasCentroFormacion` (`idAreasCentroFormacion`),
+  CONSTRAINT `FK_AreasCentroFormacion_ProductosAreasCentroFormacion` FOREIGN KEY (`idAreasCentroFormacion`) REFERENCES `areascentroformacion` (`idAreasCentroFormacion`),
+  CONSTRAINT `FK_Productos_ProductosAreasCentroFormacion` FOREIGN KEY (`idProducto`) REFERENCES `productos` (`idProducto`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `producto_areas_centro_formacion_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `producto_areas_centro_formacion_crud`(
+in pIdProducto int,
+in pIdAreasCentroFormacion int,
+in pIdProductoAreasCentroFormacion int,
+in accion varchar(45)
+)
+BEGIN
+	case accion
+		when 'nuevo' then
+			if (pIdAreasCentroFormacion != '') then
+				IF !EXISTS(select idProducto, idAreasCentroFormacion from productosareascentroformacion where idProducto = pIdProducto and idAreasCentroFormacion = pIdAreasCentroFormacion) then
+					insert into productosareascentroformacion(idProducto,idAreasCentroFormacion,created_at,updated_at)
+						values (pIdProducto,pIdAreasCentroFormacion,now(),now());
+					COMMIT;
+						select 'Area Centro de Formacion y hoja de Seguridad guardado correctamente' as mensaje, @@identity AS id;
+					ELSE
+						select 'El Area Centro de Formacion y Hoja de Seguridad a guardar Ya existe' as mensaje, 'error' AS id;
+					END IF;
+			else
+				select 'Revise el campos: Nombre del Area de Formacion que este *lleno*' as mensaje;
+			end if;
+                
+		/* Espacio de UPDATE*/
+        when 'editar' then
+			IF (pIdProductoAreasCentroFormacion != '') then
+				IF EXISTS(select idProductoAreasCentroFormacion from productosareascentroformacion where idProductoAreasCentroFormacion = pIdProductoAreasCentroFormacion) then
+					update productosareascentroformacion set
+					idProducto = pIdProducto,idAreasCentroFormacion = pIdAreasCentroFormacion,updated_at = now()
+					where idProductoAreasCentroFormacion = pIdProductoAreasCentroFormacion;
+					COMMIT;
+					select 'Los datos se actualizaron correctamente' as mensaje;
+				ELSE
+					select 'No existe el Producto Area Centro de Formacion verifiquelo' as mensaje;
+				END IF;
+			ELSE
+				select 'No se puede continuar, un campo esta vacio' as mensaje;
+			END IF;
+            
+        /* Espacio de DELETE*/
+		when 'borrar' then
+			IF EXISTS(select idProductoAreasCentroFormacion from productosareascentroformacion where idProductoAreasCentroFormacion = pIdProductoAreasCentroFormacion) then
+				delete from productosareascentroformacion where idProductoAreasCentroFormacion = pIdProductoAreasCentroFormacion;
+				COMMIT;
+                select 'Producto Area Centro de Formacion Borrado con exito' as mensaje;
+            ELSE
+				select 'No existe el Producto Area Centro de Formacion a borrar' as mensaje;
+            END IF;
+            
+		/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idAreasCentroFormacion from productosareascentroformacion where idAreasCentroFormacion = pIdAreasCentroFormacion) then
+				select idProductoAreasCentroFormacion, acf.nombreArea, prod.nombreProducto, prod.marca from areascentroformacion as acf 
+                inner join productosareascentroformacion as pacf on acf.idAreasCentroFormacion = pacf.idAreasCentroFormacion 
+                inner join productos as prod on pacf.idProducto = prod.idProducto 
+                where pacf.idAreasCentroFormacion = pIdAreasCentroFormacion;
+			ELSE
+				select 'No existe el Producto Area Centro de Formacion' as mensaje;
+            END IF;
+    end case;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS `producto_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `producto_crud`(
+in pNombreProducto varchar(100),
+in pMarca varchar(100),
+in pCodigo varchar(100),
+in pRequiereHojaSeguridad boolean,
+in pArchivoHojaSeguridad longblob,
+in pIdProducto int,
+in accion varchar(45)
+)
+BEGIN
+	case accion
+		/* Espacio de INSERT*/
+		when 'nuevo' then
+			if(pNombreProducto != '' and pMarca != '' and pRequiereHojaSeguridad != '') then
+				IF !EXISTS(select nombreProducto, marca from productos 
+				where nombreProducto = pNombreProducto and marca = pMarca) then
+					insert into productos(nombreProducto, marca, codigo, requiereHojaSeguridad, archivoHojaSeguridad,created_at,updated_at)
+						values (pNombreProducto, pMarca, pCodigo, pRequiereHojaSeguridad, pArchivoHojaSeguridad,now(),now());
+					COMMIT;
+					select 'Producto guardado correctamente' as mensaje, @@identity AS id;
+					
+				ELSE
+					select 'El Producto a guardar Ya existe' as mensaje, 'error' AS id;
+				END IF;
+			else
+				select 'Verifique el campos Nombre, Marca, y Requiere hoja seguridad que esten *llenos*' as mensaje;
+			end if;
+            
+		/* Espacio de UPDATE*/
+			when 'editar' then
+				IF (pIdProducto != '') then
+					IF EXISTS(select idProducto from productos where idProducto = pIdProducto) then
+						update productos set
+						nombreProducto = pNombreProducto, marca = pMarca, codigo = pCodigo, requiereHojaSeguridad = pRequiereHojaSeguridad, archivoHojaSeguridad = pArchivoHojaSeguridad, updated_at = now()
+						where idProducto = pIdProducto;
+						COMMIT;
+						select 'Los datos se actualizaron correctamente' as mensaje;
+					ELSE
+						select 'No existe el Producto verifiquelo' as mensaje;
+					END IF;
+				ELSE
+					select 'No se puede continuar, un campo esta vacio' as mensaje;
+				END IF;
+				
+		/* Espacio de DELETE*/
+			when 'borrar' then
+				IF EXISTS(select idProducto from productos where idProducto = pIdProducto) then
+					delete from productos where idProducto = pIdProducto;
+					COMMIT;
+					select 'Producto Borrado con exito' as mensaje;
+				ELSE
+					select 'No existe el Producto a borrar' as mensaje;
+				END IF;
+                
+			/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idProducto from productos where idProducto = pIdProductos) then
+				select * from productos where idProducto = pIdProductos;
+			ELSE
+				select 'No existe el Producto!!!' as mensaje;
+            END IF;
+
+	end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `puesto`;
+CREATE TABLE IF NOT EXISTS `puesto` (
+  `idPuesto` int(11) NOT NULL AUTO_INCREMENT,
+  `nombrePuesto` varchar(100) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idPuesto`),
+  UNIQUE KEY `nombrePuesto` (`nombrePuesto`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `puestos_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `puestos_crud`(
+	in pIdPuesto int,
+    in pNombrePuesto varchar(100),
+    in accion varchar(40)
+)
+BEGIN
+	case accion
+		/* Espacio de INSERT*/
+		when 'nuevo' then
+			IF !EXISTS(select nombrePuesto from puesto where nombrePuesto = pNombrePuesto) then
+				insert into puesto(nombrePuesto,created_at,updated_at)
+					values (pNombrePuesto,now(),now());
+				COMMIT;
+                select 'Puesto guardado correctamente' as mensaje, @@identity AS id;
+			ELSE
+				select 'El Puesto a guardar Ya existe' as mensaje, 'error' AS id;
+            END IF;
+            
+		/* Espacio de UPDATE*/
+        when 'editar' then
+			IF (pIdPuesto != '') then
+				IF EXISTS(select idPuesto from puesto where idPuesto = pIdPuesto) then
+					update puesto set
+					nombrePuesto = pNombrePuesto, updated_at = now()
+					where idPuesto = pIdPuesto;
+					COMMIT;
+					select 'Los datos se actualizaron correctamente' as mensaje;
+				ELSE
+					select 'No existe el Puesto verifiquelo' as mensaje;
+				END IF;
+			ELSE
+				select 'No se puede continuar, un campo esta vacio' as mensaje;
+			END IF;
+		/* Espacio de DELETE*/
+		when 'borrar' then
+			IF EXISTS(select idPuesto from puesto where idPuesto = pIdPuesto) then
+				IF !EXISTS (select * from funcionario where idPuesto = pIdPuesto) then
+					delete from puesto where idPuesto = pIdPuesto;
+					COMMIT;
+					select 'Puesto Borrado con exito' as mensaje;
+				ElSE 
+					select 'No se puede puede borrar, un funcionario peretence al puesto' as mensaje;
+				END IF;
+            ELSE
+				select 'No existe el Puesto a borrar' as mensaje;
+            END IF;
+		/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idPuesto from puesto where idPuesto = pIdPuesto) then
+				select idPuesto,nombrePuesto,created_at,updated_at from puesto where idPuesto = pIdPuesto;
+			ELSE
+				select 'No existe el puesto' as mensaje;
+            END IF;
+	end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `reporte`;
+CREATE TABLE IF NOT EXISTS `reporte` (
+  `idReporte` int(11) NOT NULL AUTO_INCREMENT,
+  `aspectoAmbiental` varchar(100) NOT NULL,
+  `prioridad` varchar(45) NOT NULL,
+  `presupuesto` int(11) NOT NULL,
+  `fechaInicial` date NOT NULL,
+  `fechaFinal` date NOT NULL,
+  `metaAmbiental` varchar(100) NOT NULL,
+  `estado` tinyint(1) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idReporte`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `reportefuncionario`;
+CREATE TABLE IF NOT EXISTS `reportefuncionario` (
+  `idReporteFuncionario` int(11) NOT NULL AUTO_INCREMENT,
+  `idReporte` int(11) NOT NULL,
+  `idFuncionario` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idReporteFuncionario`),
+  KEY `FK_Reporte_RF` (`idReporte`),
+  KEY `FK_Funcionario_RF` (`idFuncionario`),
+  CONSTRAINT `FK_Funcionario_RF` FOREIGN KEY (`idFuncionario`) REFERENCES `funcionario` (`idFuncionario`),
+  CONSTRAINT `FK_Reporte_RF` FOREIGN KEY (`idReporte`) REFERENCES `reporte` (`idReporte`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `reportes_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `reportes_crud`(
+in pAspectoAmbiental varchar(100),
+in pPrioridad varchar(45),
+in pPresupuesto int,
+in pFechaInicial date,
+in pFechaFinal date,
+in pMetaAmbiental varchar(100),
+in pEstado boolean,
+in pIdReporte int,
+in accion varchar(40)
+)
+BEGIN
+	case accion
+			/* Espacio de INSERT*/
+		when 'nuevo' then
+			IF !EXISTS(select aspectoAmbiental, prioridad, presupuesto, fechaInicial, fechaFinal, metaAmbiental, estado from reporte 
+            where aspectoAmbiental = pAspectoAmbiental and prioridad = pPrioridad and presupuesto = pPresupuesto 
+            and fechaInicial = pFechaInicial and fechaFinal = pFechaFinal and metaAmbiental = pMetaAmbiental and estado = pEstado) then
+				insert into reporte(aspectoAmbiental, prioridad, presupuesto, fechaInicial, fechaFinal, metaAmbiental, estado,created_at,updated_at)
+					values (pAspectoAmbiental,pPrioridad,pPresupuesto,pFechaInicial,pFechaFinal,pMetaAmbiental,pEstado,now(),now());
+				COMMIT;
+                select 'Encabezado guardado correctamente' as mensaje, @@identity AS id;
+			ELSE
+				select 'El Encabezado a guardar Ya existe' as mensaje, 'error' AS id;
+            END IF;
+            
+            /* Espacio de UPDATE*/
+        when 'editar' then
+			IF (pIdReporte != '') then
+				IF EXISTS(select idReporte from reporte where idReporte = pIdReporte) then
+					update reporte set
+					aspectoAmbiental = pAspectoAmbiental, prioridad = pPrioridad, presupuesto = pPresupuesto, fechaInicial = pFechaInicial,
+                    fechaFinal = pFechaFinal, metaAmbiental = pMetaAmbiental, estado = pEstado, updated_at = now()
+					where idReporte = pIdReporte;
+					COMMIT;
+					select 'Los datos se actualizaron correctamente' as mensaje;
+				ELSE
+					select 'No existe el Encabezado verifiquelo' as mensaje;
+				END IF;
+			ELSE
+				select 'No se puede continuar, un campo esta vacio' as mensaje;
+			END IF;
+            
+            /* Espacio de DELETE*/
+		when 'borrar' then
+			IF EXISTS(select idReporte from reporte where idReporte = pIdReporte) then
+				delete from reporte where idReporte = pIdReporte;
+				COMMIT;
+                select 'Encabezado Borrado con exito' as mensaje;
+            ELSE
+				select 'No existe el Encabezado a borrar' as mensaje;
+            END IF;
+
+			/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idReporte from reporte where idReporte = pIdReporte) then
+				select idReporte,aspectoAmbiental,created_at,updated_at from reporte where idReporte = pIdReporte;
+			ELSE
+				select 'No existe el Reporte!!!' as mensaje;
+            END IF;
+
+	end case;
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS `sp_actualizar_funcionario`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_actualizar_funcionario`(
+	in pCedula int,
+	in pNombre varchar(45),
+	in pPriApellido varchar(45),
+	in pSegApellido varchar(45),
+	in pCorreo varchar(100),
+	in pTelefono varchar(100),
+	in pIdPuesto int
+)
+BEGIN
+	IF (pCedula != '' and pNombre != '' and pPriApellido != '' and pSegApellido != '' and pCorreo != '' and pTelefono != '') then
+		IF exists(select cedula from funcionario where cedula = pCedula) then
+		update funcionario set
+		nombre = pNombre, priApellido = pPriApellido, segApellido = pSegApellido, correo = pCorreo, telefono = pTelefono, idPuesto = pIdPuesto, updated_at = now()
+		where cedula = pCedula;
+        select 'Funcionario actualizado con exito' as mensaje;
+		COMMIT;
+        else
+        select 'No existe el Funcionario verifiquelo' as mensaje;
+        END IF;
+    ELSE
+		select 'No se puede continuar, un campo esta vacio' as mensaje;
+	END IF;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `tipoactividad`;
+CREATE TABLE IF NOT EXISTS `tipoactividad` (
+  `idTipoActividad` int(11) NOT NULL AUTO_INCREMENT,
+  `nombreActividad` varchar(100) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idTipoActividad`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `tipoactividadavance`;
+CREATE TABLE IF NOT EXISTS `tipoactividadavance` (
+  `idTipoActividadAvance` int(11) NOT NULL AUTO_INCREMENT,
+  `idTipoActividad` int(11) DEFAULT NULL,
+  `idAvance` int(11) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`idTipoActividadAvance`),
+  KEY `FK_TipoActividad_TipoActividadAvance` (`idTipoActividad`),
+  KEY `FK_Avance_TipoActividadAvance` (`idAvance`),
+  CONSTRAINT `FK_Avance_TipoActividadAvance` FOREIGN KEY (`idAvance`) REFERENCES `avance` (`idAvance`),
+  CONSTRAINT `FK_TipoActividad_TipoActividadAvance` FOREIGN KEY (`idTipoActividad`) REFERENCES `tipoactividad` (`idTipoActividad`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+DROP PROCEDURE IF EXISTS `tipo_actividad_crud`;
+DELIMITER //
+CREATE DEFINER=`root`@`localhost` PROCEDURE `tipo_actividad_crud`(
+in pNombreActividad varchar(100),
+in pIdTipoActividad int,
+in pIdActividadAmbiental int,
+in accion varchar(45)
+)
+BEGIN
+	case accion
+		/* Espacio de INSERT*/
+		when 'nuevo' then
+			IF !EXISTS(select nombreActividad from tipoactividad where nombreActividad = pNombreActividad) then
+				insert into tipoactividad(nombreActividad,created_at,updated_at)
+					values (pNombreActividad,now(),now());
+				COMMIT;
+                /*If para llenar tabla intermedia*/
+					if exists(select descripcionActividadAmbiental from actividadambiental where idActividadAmbiental = pIdActividadAmbiental) then
+						insert into actividadambientaltipoactividad(idActividadAmbiental,idTipoActividad,created_at,updated_at)
+							values (pIdActividadAmbiental,@@identity,now(),now());
+					end if;
+                select 'El Tipo Actividad se ha guardado correctamente' as mensaje, @@identity AS id;
+			ELSE
+				select 'El Tipo Actividad a guardar Ya existe' as mensaje, 'error' AS id;
+            END IF;
+            /* Espacio de UPDATE*/
+        when 'editar' then
+			IF (pIdTipoActividad != '' and pNombreActividad != '') then
+				IF EXISTS(select idTipoActividad from tipoactividad where idTipoActividad = pIdTipoActividad) then
+					update tipoactividad set
+					nombreActividad = pNombreActividad, updated_at = now()
+					where idTipoActividad = pIdTipoActividad;
+					COMMIT;
+					select 'Los datos se actualizaron correctamente' as mensaje;
+				ELSE
+					select 'No existe el Tipo de Actividad, verifiquelo' as mensaje;
+				END IF;
+			ELSE
+				select 'No se puede continuar, un campo esta vacio' as mensaje;
+			END IF;
+		/* Espacio de DELETE*/
+		when 'borrar' then
+			IF EXISTS(select idTipoActividad from tipoactividad where idTipoActividad = pIdTipoActividad) then
+				delete from tipoactividad where idTipoActividad = pIdTipoActividad;
+				COMMIT;
+                select 'Tipo de Actividad Borrada con exito' as mensaje;
+            ELSE
+				select 'No existe el Tipo Actividad a borrar' as mensaje;
+            END IF;
+		/* Espacio de SELECT*/
+		when 'consultar' then
+			IF EXISTS(select idTipoActividad from tipoactividad where idTipoActividad = pIdTipoActividad) then
+				select idTipoActividad,nombreActividad,created_at,updated_at from tipoactividad where idTipoActividad = pIdTipoActividad;
+			ELSE
+				select 'No existe el tipo de actividad' as mensaje;
+            END IF;
+	end case;
+END//
+DELIMITER ;
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP VIEW IF EXISTS `view_actividad_ambiental`;
+CREATE TABLE `view_actividad_ambiental` (
+	`idActividadAmbiental` INT(11) NOT NULL,
+	`descripcionActividadAmbiental` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`indicador` VARCHAR(45) NOT NULL COLLATE 'latin1_swedish_ci',
+	`recurso` VARCHAR(45) NULL COLLATE 'latin1_swedish_ci',
+	`created_at` TIMESTAMP NULL,
+	`updated_at` TIMESTAMP NULL
+) ENGINE=MyISAM;
+
+DROP VIEW IF EXISTS `view_listar_areas_centro_formacion`;
+CREATE TABLE `view_listar_areas_centro_formacion` (
+	`idAreasCentroFormacion` INT(11) NOT NULL,
+	`nombreArea` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`ubicacion` VARCHAR(100) NULL COLLATE 'latin1_swedish_ci',
+	`created_at` TIMESTAMP NULL,
+	`updated_at` TIMESTAMP NULL
+) ENGINE=MyISAM;
+
+DROP VIEW IF EXISTS `view_listar_avances`;
+CREATE TABLE `view_listar_avances` (
+	`idAvance` INT(11) NOT NULL,
+	`descripcionAvance` VARCHAR(200) NOT NULL COLLATE 'latin1_swedish_ci',
+	`created_at` TIMESTAMP NULL,
+	`updated_at` TIMESTAMP NULL
+) ENGINE=MyISAM;
+
+DROP VIEW IF EXISTS `view_listar_funcionarios`;
+CREATE TABLE `view_listar_funcionarios` (
+	`idFuncionario` INT(11) NOT NULL,
+	`nombre` VARCHAR(45) NOT NULL COLLATE 'latin1_swedish_ci',
+	`cedula` INT(11) NOT NULL,
+	`priApellido` VARCHAR(45) NOT NULL COLLATE 'latin1_swedish_ci',
+	`segApellido` VARCHAR(45) NOT NULL COLLATE 'latin1_swedish_ci',
+	`correo` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`telefono` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`idPuesto` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci'
+) ENGINE=MyISAM;
+
+DROP VIEW IF EXISTS `view_listar_productos`;
+CREATE TABLE `view_listar_productos` (
+	`idProducto` INT(11) NOT NULL,
+	`nombreProducto` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`marca` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`codigo` VARCHAR(100) NULL COLLATE 'latin1_swedish_ci',
+	`requiereHojaSeguridad` TINYINT(4) NOT NULL,
+	`archivoHojaSeguridad` LONGBLOB NULL,
+	`created_at` TIMESTAMP NULL,
+	`updated_at` TIMESTAMP NULL
+) ENGINE=MyISAM;
+
+DROP VIEW IF EXISTS `view_listar_reportes`;
+CREATE TABLE `view_listar_reportes` (
+	`idReporte` INT(11) NOT NULL,
+	`aspectoAmbiental` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`prioridad` VARCHAR(45) NOT NULL COLLATE 'latin1_swedish_ci',
+	`presupuesto` INT(11) NOT NULL,
+	`fechaInicial` DATE NOT NULL,
+	`fechaFinal` DATE NOT NULL,
+	`metaAmbiental` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`estado` TINYINT(1) NULL,
+	`created_at` TIMESTAMP NULL,
+	`updated_at` TIMESTAMP NULL
+) ENGINE=MyISAM;
+
+DROP VIEW IF EXISTS `view_listar_tipo_actividad`;
+CREATE TABLE `view_listar_tipo_actividad` (
+	`idTipoActividad` INT(11) NOT NULL,
+	`nombreActividad` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
+	`created_at` TIMESTAMP NULL,
+	`updated_at` TIMESTAMP NULL
+) ENGINE=MyISAM;
+
+DROP VIEW IF EXISTS `view_mostrar_tipos_puesto`;
+CREATE TABLE `view_mostrar_tipos_puesto` (
+	`idPuesto` INT(11) NOT NULL,
+	`nombrePuesto` VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci'
+) ENGINE=MyISAM;
+
+DROP VIEW IF EXISTS `view_actividad_ambiental`;
+DROP TABLE IF EXISTS `view_actividad_ambiental`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_actividad_ambiental` AS select * from actividadambiental ;
+
+DROP VIEW IF EXISTS `view_listar_areas_centro_formacion`;
+DROP TABLE IF EXISTS `view_listar_areas_centro_formacion`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_listar_areas_centro_formacion` AS select * from areascentroformacion ;
+
+DROP VIEW IF EXISTS `view_listar_avances`;
+DROP TABLE IF EXISTS `view_listar_avances`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_listar_avances` AS SELECT 
+        `avance`.`idAvance` AS `idAvance`,
+        `avance`.`descripcionAvance` AS `descripcionAvance`,
+        `avance`.`created_at` AS `created_at`,
+        `avance`.`updated_at` AS `updated_at`
+    FROM
+        `avance` ;
+
+DROP VIEW IF EXISTS `view_listar_funcionarios`;
+DROP TABLE IF EXISTS `view_listar_funcionarios`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_listar_funcionarios` AS select idFuncionario,nombre,cedula,priApellido,segApellido,correo,telefono,nombrePuesto as idPuesto from funcionario as f inner join puesto as p on f.idPuesto = p.idPuesto
+where f.idPuesto = p.idPuesto ;
+
+DROP VIEW IF EXISTS `view_listar_productos`;
+DROP TABLE IF EXISTS `view_listar_productos`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_listar_productos` AS select * from productos ;
+
+DROP VIEW IF EXISTS `view_listar_reportes`;
+DROP TABLE IF EXISTS `view_listar_reportes`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_listar_reportes` AS select * from reporte ;
+
+DROP VIEW IF EXISTS `view_listar_tipo_actividad`;
+DROP TABLE IF EXISTS `view_listar_tipo_actividad`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_listar_tipo_actividad` AS select idTipoActividad,nombreActividad,created_at,updated_at from tipoactividad ;
+
+DROP VIEW IF EXISTS `view_mostrar_tipos_puesto`;
+DROP TABLE IF EXISTS `view_mostrar_tipos_puesto`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_mostrar_tipos_puesto` AS (
+	SELECT p.idPuesto, p.nombrePuesto
+	FROM puesto as p
+) ;
+
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

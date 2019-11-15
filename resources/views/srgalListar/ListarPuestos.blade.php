@@ -8,6 +8,15 @@ Listar Puestos
 @stop
 
 @section('contenido')
+  <script>//Ventana alert que imprime el resultado SQL que devuelve el controlador  -->
+    var msg = '{{Session::get('alert')}}';
+    var exist = '{{Session::has('alert')}}';
+    if(exist){
+      alert(msg);
+    }
+  </script>
+
+    Formulario
   <form action="EditarPuesto" method="POST">
     {{ csrf_field() }}
       <div class="float-right" style=" position: fixed; right: 10px; z-index: 2000" >

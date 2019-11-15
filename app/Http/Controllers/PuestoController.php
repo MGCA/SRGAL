@@ -81,7 +81,10 @@ class PuestoController extends Controller
             $idPuesto = $request -> idPuesto;
             $nombrePuesto = $request -> nombrePuesto;
             $sql = $this->FuncionesTSQL->crudPuesto($idPuesto,'',$btn);
-            return view('mensaje')->with('mensaje', $sql);
+            foreach($sql as $g)
+            if(isset($g->mensaje)){
+                return redirect()->back() ->with('alert', $g->mensaje);
+            }
         }
 
     }

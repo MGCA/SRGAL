@@ -20,4 +20,29 @@ class DocumentosGeneralesController extends Controller
     public function index(){
         return view('srgalAgregar/DocumentosGenerales');
     }
+
+    public function AccionDocumentosGenerales(Request $request){
+
+        if($request->btn == 'guardarDocumentosGenerales'){
+
+
+            $nombreDocumento = $request->nombreDocumento;
+            $tipoEvidencia = $request->tipoEvidencia;
+            $fechaCreaccion =$request->fechaCreacion;
+            if(empty($_FILES['archivoDocumentoGeneral']['tmp_name'])){
+                $archivoDocumentoGeneral = null;
+            }else{
+            $archivoDocumentoGeneral = file_get_contents($_FILES['archivoDocumentoGeneral']['tmp_name']);  
+            }
+            $idResponsable = $request->idResponsable;
+
+
+            $sql = $this->FuncionesTSQL->crudDocumentosGenerales($nombreDocumento,$tipoEvidencia,$fechaCreaccion,$archivoDocumentoGeneral,$idResponsable,null,'nuevo');
+            
+            foreach($sql as $g)
+            if(isset($g->mensaje)){
+                return redirect()->back() ->with('alert', $g->mensaje);
+            }
+        }
+    }
 }

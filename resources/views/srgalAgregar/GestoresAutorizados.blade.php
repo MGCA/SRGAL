@@ -67,7 +67,7 @@ Gestores Autorizados
                   <input name="nombreGestor" type="text" class="form-control text-center" placeholder="ESCRIBA EL NOMBRE AQUI">
               </div>
               <div class="form-group col-md-6">
-                  <label>Telefono:</label>
+                  <label>Telefono de la Empresa:</label>
                   <input name="telefonoGestor" type="text" class="form-control text-center" placeholder="506-0000-0000">
               </div>
           </div>
@@ -99,12 +99,7 @@ Gestores Autorizados
           <div class="row">
               <div class="form-group col">
                   <label>Tipo de Residuos:</label>
-                  <select name="tipoResiduo" class="text-center form-control border-dark">
-                      <option value="{{null}}" selected>Open this select menu</option>
-                      <option value="1">One</option>
-                      <option value="2">Two</option>
-                      <option value="3">Three</option>
-                  </select>
+                  <input name="tipoResiduo" type="text" class="form-control text-center" placeholder="ESCRIBA EL TIPO DE RESIDUO">
               </div>
               <div class="align-items-center form-group col">
                   <label>Fecha de Vencimiento de Permiso</label>

@@ -19,7 +19,7 @@ class DepartamentoHojasSeguridadController extends Controller
 
     public function index(){
         $listaProductos = $this->FuncionesTSQL->getListarProductos();
-        $listaAreaCentroFormacion = $this->FuncionesTSQL->getListarAreaCentroFormacion();
+        $listaAreaCentroFormacion =  $this->FuncionesTSQL->getListarAreaCentroFormacion();
         return view('srgalAgregar/DepartamentoHojasSeguridad')->with('listaProductos', $listaProductos)->with('listaAreaCentroFormacion', $listaAreaCentroFormacion);
     }
 
@@ -72,4 +72,8 @@ class DepartamentoHojasSeguridadController extends Controller
         
 
     }
+    public function cargarAreasConHojas(){
+        return $listaAreas = $this->FuncionesTSQL->crudAreaCentroFormacion('','',$id,'consultar');
+    }
+    
 }

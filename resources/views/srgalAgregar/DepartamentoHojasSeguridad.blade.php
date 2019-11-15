@@ -57,9 +57,9 @@ Modulo Seguridad
 @stop
 
 @section('imagenes')
-<!-- <script type="text/javascript" src="{{ asset('plugins/personales/scriptGuardar.js')}}">
-
-</script> -->
+<!-- 
+  
+-->
   <div class="container">
     <br>   
     <div class="container text-center"><!-- INICIO FORM VINCULAR PRODUCTOS HOJAS -->
@@ -70,11 +70,11 @@ Modulo Seguridad
           <div class="col-6">
             <label>AREAS DEL CENTRO DE FORMACION</label>
             <hr>
-            <select name="idAreasCentroFormacion" class="text-center form-control border-dark" required="true">     
-                <option value="{{null}}" selected>SELECCIONE EL AREA DEL CENTRO DE FORMACION</option>
-                @foreach($listaAreaCentroFormacion as $a)
-                <option value="{{$a->idAreasCentroFormacion}}">{{$a->nombreArea}}</option>
-                @endforeach
+            <select id="idAreasCentroFormacion" name="idAreasCentroFormacion" class="text-center form-control border-dark" required="true">
+              <option value="{{null}}" selected>SELECCIONE EL AREA DEL CENTRO DE FORMACION</option>
+              @foreach($listaAreaCentroFormacion as $a)
+              <option value="{{$a->idAreasCentroFormacion}}">{{$a->nombreArea}}</option>
+              @endforeach 
             </select>
             <br>
             <div>     <!--INI Carga Hojas de Seguridad del area Seleccionada -->
@@ -168,3 +168,6 @@ Modulo Seguridad
     </div>
   </div>
 @stop
+<!-- @push('scripts')
+<script src="{{ asset('plugins/personales/DepartamentoHojasSeguridad.js')}}" crossorigin="anonymous"></script>
+@endpush -->

@@ -25,8 +25,11 @@ Route::post('/ModuloSeguridad', 'DepartamentoHojasSeguridadController@AccionDepa
 Route::get('/GestoresAutorizados', 'GestoresAutorizadosController@index');
 Route::post('/GestoresAutorizados', 'GestoresAutorizadosController@AccionGestoresAutorizados');
 
+
+
 //Modulo Documentos Generales
 Route::get('/DocumentosGenerales', 'DocumentosGeneralesController@index');
+Route::post('/DocumentosGenerales', 'DocumentosGeneralesController@AccionDocumentosGenerales');
 
 /*Route::get('/GestionPgai',function(){
     return view('GestionPgai');
