@@ -1,6 +1,13 @@
 @extends('admin.template.plantillaNuevoReporte')
 
     @section('EncabezadoReporte')
+    <script>
+        var msg = '{{Session::get('alert')}}';
+        var exist = '{{Session::has('alert')}}';
+        if(exist){
+            alert(msg);
+        }
+    </script>
         <form method="POST" data-toggle="validator" action="EditarReporte">
             {{ csrf_field()}}
             <h6 class="modal-title text-center">REPORTE</h6>

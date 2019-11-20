@@ -30,6 +30,13 @@ Route::post('/GestoresAutorizados', 'GestoresAutorizadosController@AccionGestore
 //Modulo Documentos Generales
 Route::get('/DocumentosGenerales', 'DocumentosGeneralesController@index');
 Route::post('/DocumentosGenerales', 'DocumentosGeneralesController@AccionDocumentosGenerales');
+//listar
+Route::get('/ListarDocumentosGenerales', 'DocumentosGeneralesController@ListarDocumentosGenerales');
+//descargar
+// Route::get('/DescargarDocumentoGeneral','DocumentosGeneralesController@DescargarDocumentoGeneral');
+// Route::post('/DescargarDocumentoGeneral','DocumentosGeneralesController@DescargarDocumentoGeneral');
+
+
 
 /*Route::get('/GestionPgai',function(){
     return view('GestionPgai');

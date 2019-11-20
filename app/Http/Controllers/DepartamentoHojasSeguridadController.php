@@ -33,11 +33,40 @@ class DepartamentoHojasSeguridadController extends Controller
             $requiereHojaSeguridad = $request -> requiereHojaSeguridad;
             if(empty($_FILES['archivoHojaSeguridad']['tmp_name'])){
                 $archivoHojaSeguridad = null;
+                $nombreArchivo = null;
+                $tipoArchivo = null;
             }else{
-            $archivoHojaSeguridad = file_get_contents($_FILES['archivoHojaSeguridad']['tmp_name']);  
+                $permitidos = array("image/jpg","image/jpeg","image/png","application/pdf","application/docx","application/docs");
+                if(in_array($_FILES['archivoHojaSeguridad']['type'], $permitidos)){
+                    $nombreArchivo = $_FILES["archivoHojaSeguridad"]["name"];
+                    $tipoArchivo = $_FILES["archivoHojaSeguridad"]["type"];
+                    $archivoHojaSeguridad = file_get_contents($_FILES['archivoHojaSeguridad']['tmp_name']);
+                    
+                    $sql = $this->FuncionesTSQL->crudProducto($nombreProducto,$marca,$codigo,$requiereHojaSeguridad,$nombreArchivo,$tipoArchivo,null,'nuevo');
+                   
+                    $consulta = array_values($sql)[0];
+
+                    $rutaCarpeta = "archivos/hojasSeguridad/$consulta->id/"; // Rura en la carpeta public donde estaran los archivos
+                    if(!file_exists($rutaCarpeta))
+                    {
+                        mkdir($rutaCarpeta);
+                    }
+                    if(!file_exists($nombreArchivo)){
+                        move_uploaded_file($_FILES['archivoHojaSeguridad']['tmp_name'],"$rutaCarpeta".$nombreArchivo);
+                        
+                        // imprime resultado de la BD $consulta
+                        return redirect()->back() ->with('alert', $consulta->mensaje);
+                    }else{
+                        $mensaje = 'El archivo ya existe, o tiene el mismo nombre';
+                    return redirect()->back() ->with('alert', $mensaje);
+                    }
+
+                }else{
+                    $mensaje = 'archivo no permitido';
+                    return redirect()->back() ->with('alert', $mensaje);
+                }
             }
             
-            $sql = $this->FuncionesTSQL->crudProducto($nombreProducto,$marca,$codigo,$requiereHojaSeguridad,$archivoHojaSeguridad,null,'nuevo');
             foreach($sql as $g)
             if(isset($g->mensaje)){
                 return redirect()->back() ->with('alert', $g->mensaje);

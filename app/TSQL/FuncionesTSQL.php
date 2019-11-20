@@ -33,12 +33,12 @@ class FuncionesTSQL{
         return \DB::select('CALL avances_crud(?,?,?,?)', array($descripcionAvance,$idAvance,$idTipoActividad,$accion));
     }//STORE PROCEDURE CRUD de tabla AVANCES
     //STORE PROCEDURE CRUD de tabla EVIDENCIAS
-    public function crudEvidencia($nombreEvidencia,$archivo,$nombreArchivo,$idEvidencia,$idAvance,$accion){
-        return \DB::select('CALL evidencias_crud(?,?,?,?,?,?)', array($nombreEvidencia,$archivo,$nombreArchivo,$idEvidencia,$idAvance,$accion));
+    public function crudEvidencia($nombreEvidencia,$tipoArchivo,$nombreArchivo,$idEvidencia,$idAvance,$accion){
+        return \DB::select('CALL evidencias_crud(?,?,?,?,?,?)', array($nombreEvidencia,$tipoArchivo,$nombreArchivo,$idEvidencia,$idAvance,$accion));
     }//STORE PROCEDURE CRUD de tabla EVIDENCIAS
     //STORE PROCEDURE CRUD de tabla PRODUCTOS
-    public function crudProducto($nombreProducto,$marca,$codigo,$requiereHojaSeguridad,$archivoHojaSeguridad,$idProducto,$accion){
-        return \DB::select('CALL producto_crud(?,?,?,?,?,?,?)', array($nombreProducto,$marca,$codigo,$requiereHojaSeguridad,$archivoHojaSeguridad,$idProducto,$accion));
+    public function crudProducto($nombreProducto,$marca,$codigo,$requiereHojaSeguridad,$nombreArchivo,$tipoArchivo,$idProducto,$accion){
+        return \DB::select('CALL producto_crud(?,?,?,?,?,?,?,?)', array($nombreProducto,$marca,$codigo,$requiereHojaSeguridad,$nombreArchivo,$tipoArchivo,$idProducto,$accion));
     }//STORE PROCEDURE CRUD de tabla PRODUCTOS
     //STORE PROCEDURE CRUD de tabla AREASCENTROFORMACION
     public function crudAreaCentroFormacion($nombreArea,$ubicacion,$idAreasCentroFormacion,$accion){
@@ -49,12 +49,12 @@ class FuncionesTSQL{
         return \DB::select('CALL producto_areas_centro_formacion_crud(?,?,?,?)', array($idProducto,$idAreasCentroFormacion,$idProductoAreasCentroFormacion,$accion));
     }//STORE PROCEDURE CRUD de tabla PRODUCTOSAREASCENTROFORMACION
     //STORE PROCEDURE CRUD de tabla GESTORESAUTORIZADOS
-    public function crudGestoresAutorizados($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$documentoPermiso,$idGestoresAutorizados,$accion){
-        return \DB::select('CALL gestores_autorizados_crud(?,?,?,?,?,?,?,?,?,?,?,?)', array($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$documentoPermiso,$idGestoresAutorizados,$accion));
+    public function crudGestoresAutorizados($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$nombreArchivo,$tipoArchivo,$idGestoresAutorizados,$accion){
+        return \DB::select('CALL gestores_autorizados_crud(?,?,?,?,?,?,?,?,?,?,?,?,?)', array($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$nombreArchivo,$tipoArchivo,$idGestoresAutorizados,$accion));
     }//STORE PROCEDURE CRUD de tabla GESTORESAUTORIZADOS
     //STORE PROCEDURE CRUD de tabla DOCUMENTOSGENERALES
-    public function crudDocumentosGenerales($nombreDocumento,$tipoEvidencia,$fechaCreacion,$archivoDocumentoGeneral,$idResponsable,$idDocumentosGenerales,$accion){
-        return \DB::select('CALL documentos_generales_crud(?,?,?,?,?,?,?)', array($nombreDocumento,$tipoEvidencia,$fechaCreacion,$archivoDocumentoGeneral,$idResponsable,$idDocumentosGenerales,$accion));
+    public function crudDocumentosGenerales($nombreDocumento,$tipoEvidencia,$fechaCreacion,$nombreArchivo,$tipoArchivo,$idResponsable,$idDocumentosGenerales,$accion){
+        return \DB::select('CALL documentos_generales_crud(?,?,?,?,?,?,?,?)', array($nombreDocumento,$tipoEvidencia,$fechaCreacion,$nombreArchivo,$tipoArchivo,$idResponsable,$idDocumentosGenerales,$accion));
     }//STORE PROCEDURE CRUD de tabla DOCUMENTOSGENERALES
     
        
@@ -85,6 +85,9 @@ class FuncionesTSQL{
     }
     public function getListarAreaCentroFormacion(){
         return \DB::select('select * from view_listar_areas_centro_formacion');
+    }
+    public function getListarDocumentosGenerales(){
+        return \DB::select('select * from view_listar_documentos_generales');
     }
     
 

@@ -36,11 +36,39 @@ class GestoresAutorizadosController extends Controller
 
             if(empty($_FILES['documentoPermiso']['tmp_name'])){
                 $documentoPermiso = null;
+                $nombreArchivo = null;
+                $tipoArchivo = null;
             }else{
-            $documentoPermiso = file_get_contents($_FILES['documentoPermiso']['tmp_name']);  
-            }
+                $permitidos = array("image/jpg","image/jpeg","image/png","application/pdf","application/docx","application/docs");
+                if(in_array($_FILES['documentoPermiso']['type'], $permitidos)){
+                    $nombreArchivo = $_FILES["documentoPermiso"]["name"];
+                    $tipoArchivo = $_FILES["documentoPermiso"]["type"];
+                    $documentoPermiso = file_get_contents($_FILES['documentoPermiso']['tmp_name']);
+                    
+                    $sql = $this->FuncionesTSQL->crudGestoresAutorizados($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$nombreArchivo,$tipoArchivo,null,'nuevo');
 
-            $sql = $this->FuncionesTSQL->crudGestoresAutorizados($nombreGestor,$telefonoGestor,$direccionGestor,$nombreContacto,$telefonoContacto,$correoContacto,$cedulaContacto,$tipoResiduo,$fechaVencimientoPermiso,$documentoPermiso,null,'nuevo');
+                    $consulta = array_values($sql)[0];
+
+                    $rutaCarpeta = "archivos/gestoresAutorizados/$consulta->id/"; // Rura en la carpeta public donde estaran los archivos
+                    if(!file_exists($rutaCarpeta))
+                    {
+                        mkdir($rutaCarpeta);
+                    }
+                    if(!file_exists($nombreArchivo)){
+                        move_uploaded_file($_FILES['documentoPermiso']['tmp_name'],"$rutaCarpeta".$nombreArchivo);
+                        
+                        // imprime resultado de la BD $consulta
+                        return redirect()->back() ->with('alert', $consulta->mensaje);
+                    }else{
+                        $mensaje = 'El archivo ya existe, o tiene el mismo nombre';
+                    return redirect()->back() ->with('alert', $mensaje);
+                    }
+
+                }else{
+                    $mensaje = 'archivo no permitido';
+                    return redirect()->back() ->with('alert', $mensaje);
+                }
+            }
             
             foreach($sql as $g)
             if(isset($g->mensaje)){

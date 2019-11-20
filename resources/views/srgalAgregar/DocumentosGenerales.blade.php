@@ -31,10 +31,7 @@ Documentos Generales
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ action('ReporteController@NuevoReporte') }}">Nuevo Reporte</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ action('ReporteController@pdfExportarReporte') }}">Ver Reporte</a>
+          <a class="nav-link" href="{{ action('DocumentosGeneralesController@ListarDocumentosGenerales')}}">Listar Documentos</a>
         </li>
       </ul>
       <!-- cerrar cession -->
@@ -73,12 +70,12 @@ Documentos Generales
         <label class="text-center">Tipo de Evidencia</label>
         <div class="form-control">
           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="tipoEvidencia" id="inlineRadio1">
+            <input class="form-check-input" type="radio" value="Proyecto" name="tipoEvidencia" id="inlineRadio1" required>
             <label class="form-check-label" for="inlineRadio1">Proyecto</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="tipoEvidencia" id="inlineRadio2">
-            <label class="form-check-label" for="inlineRadio2">Formulario</label>
+            <input class="form-check-input" type="radio" value="Formulario" name="tipoEvidencia" id="inlineRadio2" required>
+            <label class="form-check-label" for="inlineRadio2" >Formulario</label>
           </div>
         </div>
         

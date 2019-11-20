@@ -16,7 +16,7 @@ Listar Puestos
     }
   </script>
 
-    Formulario
+    <!-- Formulario -->
   <form action="EditarPuesto" method="POST">
     {{ csrf_field() }}
       <div class="float-right" style=" position: fixed; right: 10px; z-index: 2000" >
