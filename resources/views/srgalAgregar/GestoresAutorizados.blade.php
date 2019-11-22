@@ -31,9 +31,6 @@ Gestores Autorizados
         <li class="nav-item">
           <a class="nav-link" href="{{ action('ReporteController@NuevoReporte') }}">Nuevo Reporte</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ action('ReporteController@pdfExportarReporte') }}">Ver Reporte</a>
-        </li>
       </ul>
       <!-- cerrar cession -->
       <li class="nav-item dropdown">

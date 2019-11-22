@@ -67,7 +67,7 @@
   
   el de abajo hace uso de modo local-->
   <script>window.jQuery || document.write('<script src="{{ asset('plugins/bootstrap/js/jquery-3.3.1.slim.min.js')}}"><\/script>')</script>
-  
+  @stack('scripts')
   <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 </body>
 </html>

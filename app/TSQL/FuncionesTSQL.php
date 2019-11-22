@@ -87,8 +87,25 @@ class FuncionesTSQL{
         return \DB::select('select * from view_listar_areas_centro_formacion');
     }
     public function getListarDocumentosGenerales(){
+        
         return \DB::select('select * from view_listar_documentos_generales');
     }
+    public function getListarReporteActividadObjetivo(){
+        return \DB::select('select * from view_listar_reporte_actividad_objetivo');
+    }
+    public function getListarReporteTipoActividadEvidenciaAvanceGestor(){
+        return \DB::select('select * from view_listar_reporte_tipo_actividad_evidencia_avance_gestor');
+    }
+
+    //PROCEDIMIENTOS OBTENCION DE REPORTES
+    public function ObtenerReporteActividadObjetivo($idReporte){
+        return \DB::select('CALL obtener_reportes_actividades_objetivos(?)',array($idReporte));
+    }
+
+    public function ObtenerReporteTipoActividadEvidenciaAvance($idReporte){
+        return \DB::select('CALL obtener_reporte_tipo_actividad_evidencia_avance(?)', array($idReporte));
+    }
+
     
 
 }

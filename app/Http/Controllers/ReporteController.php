@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Reporte;
+
+use Illuminate\Support\Facades\Crypt;
+
 use App\TSQL\FuncionesTSQL;
 use Illuminate\Http\Request;
 //
 use Dompdf\Dompdf;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class ReporteController extends Controller
 {
@@ -36,14 +40,14 @@ class ReporteController extends Controller
         if($request -> btn == 'nuevo'){                   
            $idTipoActividad = null;
            $nombreActividad = $request -> nombreActividad;
-            $sql = $this->FuncionesTSQL->crudTipoActividad($idTipoActividad,$nombreActividad,$request -> btn);
+           $sql = $this->FuncionesTSQL->crudTipoActividad($idTipoActividad,$nombreActividad,$request -> btn);
         return $this -> NuevoReporte();
         }
 
         if($request -> btn == 'consultar'){                   
             $idTipoActividad = $request -> idTipoActividad;
             $nombreActividad = "";
-             $sql = $this->FuncionesTSQL->crudTipoActividad($idTipoActividad,$nombreActividad,$request -> btn);
+            $error = $sql = $this->FuncionesTSQL->crudTipoActividad($idTipoActividad,$nombreActividad,$request -> btn);
              return view('mensaje')->with('mensaje', $sql);
         }
 
@@ -58,7 +62,8 @@ class ReporteController extends Controller
             $sql = $this->FuncionesTSQL->crudReporte($aspectoAmbiental, $prioridad, $presupuesto, $fechaInicial, $fechaFinal, $metaAmbiental, $estado, null, 'nuevo');
              //return view('mensaje')->with('mensaje', $sql);
              //Trabajando para volver
-            return $this->NuevoReporte();
+             return view('mensaje')->with('mensaje', $sql);
+             return $this->NuevoReporte();
         }
 
         if($request -> btn == 'guardarActividadAmbiental'){
@@ -140,18 +145,20 @@ class ReporteController extends Controller
 
             //return $this->NuevoReporte();
 
-        }else{//Llave Guardar Evidencia
-            //else de Mensaje de las demas acciones guardar
-            foreach($sql as $g){
-                if(isset($g->mensaje)){
-                    return redirect()->back() ->with('alert', $g->mensaje);
-                }
-            }      
         }
 
     }//llave function Accion
 
-    public function pdfExportarReporte(){
+    
+    public function ListarReportes(){
+
+        $listarReportes = $this->FuncionesTSQL->getListarReportes();
+        // $listaReporteTipoActividadEvidenciaAvanceGestor = $this->FuncionesTSQL->getListarReporteTipoActividadEvidenciaAvanceGestor();
+        return view('srgalListar/Reportes')->with('listarReportes',$listarReportes);
+    }
+
+
+    public function VerReporte($idReporte){
         /*
         $dompdf = new Dompdf();
         $dompdf->set_option('isHtml5ParserEnabled', true);
@@ -159,6 +166,33 @@ class ReporteController extends Controller
         $dompdf->render();
         return $dompdf->stream('reporte-completo.pdf');
         */
-        return view('pdfVistas/reporteGeneral');
+
+        $id = Crypt::decrypt($idReporte);
+        $obtenerReportesActObj = $this->FuncionesTSQL->ObtenerReporteActividadObjetivo($id);
+        $obtenerReporteTipActEveAvaGes = $this->FuncionesTSQL->ObtenerReporteTipoActividadEvidenciaAvance($id);
+        return view('pdfVistas/reporteGeneral')->with('obtenerRepActObj', $obtenerReportesActObj)->with('obtenerTipActEveAvaGes', $obtenerReporteTipActEveAvaGes)->with('id', $id);
+
+        
     }
+
+
+    public function pdfExportarReporte($id){
+    
+        $id = Crypt::decrypt($id);
+        $obtenerReportesActObj = $this->FuncionesTSQL->ObtenerReporteActividadObjetivo($id);
+        $obtenerReporteTipActEveAvaGes = $this->FuncionesTSQL->ObtenerReporteTipoActividadEvidenciaAvance($id);
+
+        // $dompdf = new Dompdf();
+        // $dompdf->set_paper('letter', 'portrait');
+        // $dompdf->set_option('isHtml5ParserEnabled', true);
+        // $dompdf->loadHtml(view('pdfVistas/reporteGeneral')->with('obtenerRepActObj', $obtenerReportesActObj)->with('obtenerTipActEveAvaGes', $obtenerReporteTipActEveAvaGes)->with('id', $id));
+        // $dompdf->render();
+        // return $dompdf->stream('reporte-completo.pdf');
+
+
+        $pdf = PDF::loadHTML(view('pdfVistas/reporteGeneral')->with('obtenerRepActObj', $obtenerReportesActObj)->with('obtenerTipActEveAvaGes', $obtenerReporteTipActEveAvaGes)->with('id', $id))->setPaper('a4', 'landscape');
+
+        return $pdf->download();
+    }
+
 }

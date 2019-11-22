@@ -27,7 +27,7 @@ PGAI
           <a class="nav-link" href="{{ action('ReporteController@NuevoReporte') }}">Nuevo Reporte</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ action('ReporteController@pdfExportarReporte') }}">Ver Reporte</a>
+          <a class="nav-link" href="{{ action('ReporteController@ListarReportes') }}">Listar Reportes</a>
         </li>
       </ul>
       <!-- cerrar cession -->

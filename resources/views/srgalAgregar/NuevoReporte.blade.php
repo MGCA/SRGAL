@@ -69,6 +69,13 @@
         </form>
     @stop
     @section('ActividadAmbiental')
+    <script>
+        var msg = '{{Session::get('alert')}}';
+        var exist = '{{Session::has('alert')}}';
+        if(exist){
+            alert(msg);
+        }
+    </script>
         <form method="POST" data-toggle="validator" action="EditarReporte">
             {{ csrf_field()}}
             <h6 class="modal-title text-center">ACTIVIDAD AMBIENTAL</h6>
@@ -101,6 +108,13 @@
         </form>
     @stop
     @section('TipoActividad')
+    <script>
+        var msg = '{{Session::get('alert')}}';
+        var exist = '{{Session::has('alert')}}';
+        if(exist){
+            alert(msg);
+        }
+    </script>
         <form method="POST" data-toggle="validator" action="EditarReporte">
             {{ csrf_field()}}
             <h6 class="modal-title text-center">TIPO DE ACTIVIDAD</h6>
@@ -121,6 +135,13 @@
         </form>
     @stop
     @section('Objetivos')
+    <script>
+        var msg = '{{Session::get('alert')}}';
+        var exist = '{{Session::has('alert')}}';
+        if(exist){
+            alert(msg);
+        }
+    </script>
         <form method="POST" data-toggle="validator" action="EditarReporte">
             {{ csrf_field()}}
                 <h6 class="modal-title text-center">OBJETIVOS</h6>
@@ -141,6 +162,13 @@
         </form>
     @stop
     @section('Avances')
+    <script>
+        var msg = '{{Session::get('alert')}}';
+        var exist = '{{Session::has('alert')}}';
+        if(exist){
+            alert(msg);
+        }
+    </script>
         <form method="POST" data-toggle="validator" action="EditarReporte">
             {{ csrf_field()}}
                 <h6 class="modal-title text-center">AVANCES</h6>
@@ -161,6 +189,13 @@
         </form>
     @stop
     @section('Evidencias')
+    <script>
+        var msg = '{{Session::get('alert')}}';
+        var exist = '{{Session::has('alert')}}';
+        if(exist){
+            alert(msg);
+        }
+    </script>
         <form enctype="multipart/form-data" action="EditarReporte" method="POST" data-toggle="validator">
             {{ csrf_field()}}
                 <h6 class="modal-title text-center">EVIDENCIAS</h6>

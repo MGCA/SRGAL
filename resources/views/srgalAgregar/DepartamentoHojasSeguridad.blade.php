@@ -31,9 +31,6 @@ Modulo Seguridad
         <li class="nav-item">
           <a class="nav-link" href="{{ action('ReporteController@NuevoReporte') }}">Nuevo Reporte</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ action('ReporteController@pdfExportarReporte') }}">Ver Reporte</a>
-        </li>
       </ul>
       <!-- cerrar cession -->
       <li class="nav-item dropdown">
@@ -97,10 +94,11 @@ Modulo Seguridad
             </select>
           </div>
         </div>
-        <div class="container col-3">
-          <button name="btn" value="guardarHojasAreas" class="btn btn-secondary bg-dark my-4 btn-block" type="submit">GUARDAR</button>
+        <div class="container col-6">
+          <button name="btn" value="guardarHojasAreas" class="btn btn-secondary bg-dark my-4 " type="submit">AÑADIR</button>
+          <button name="btn" value="retirarHojasAreas" class="btn btn-secondary bg-dark my-4 " type="submit">RETIRAR</button>
+          <button name="btn" value="borrarrHojasAreas" class="btn btn-secondary bg-dark my-4 " type="submit">BORRAR</button>
           <hr>
-          <p>Verificar el 
           <em>Area & Hoja de seguridad</em>
         </div> 
         

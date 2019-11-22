@@ -45,6 +45,9 @@ Listar Documentos Generales
                 <a href="/archivos/documentosGenerales/{{$listaDocGen->idDocumentosGenerales}}/{{$listaDocGen->nombreArchivo}}" download="{{$listaDocGen->nombreArchivo}}">
                     <button type="submit" class="btn btn-secondary">DESCARGAR</button>
                 </a>
+                <a href="#">
+                    <button type="submit" class="btn btn-secondary">BORRAR</button>
+                </a>
               </td>
             </tr> 
         @endforeach

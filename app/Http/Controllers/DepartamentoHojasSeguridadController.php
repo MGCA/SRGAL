@@ -87,7 +87,7 @@ class DepartamentoHojasSeguridadController extends Controller
 
         if($request->btn == "guardarHojasAreas"){
             $idProducto = $request -> idProducto;
-            $idAreasCentroFormacion = $request -> idAreasCentroFormacion;
+            $idAreasCentroFormacion = $request -> idAreasCentroFormacion; 
 
             $sql = $this->FuncionesTSQL->crudProductoAreaCentroFormacion($idProducto,$idAreasCentroFormacion,null,'nuevo');
 

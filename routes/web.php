@@ -51,7 +51,20 @@ Route::get('/GestionPgai','ReporteController@index');//Vista Gestion Pgai
 Route::get('/GestionFuncionarios','FuncionarioController@index');//Vista Gestion Funcionarios
 Route::get('/NuevoReporte','ReporteController@NuevoReporte');//Vista Nuevo Reporte
 Route::get('/Agregar','PuestoController@getIndex');//Trae el select List de Puestos
-Route::get('/VerReporteCompleto','ReporteController@pdfExportarReporte');
+
+Route::get('/ListarReporte','ReporteController@ListarReportes')->name('ListarReporte');
+
+// PDF GENERADOR ruta /pdfVistas/reporteGeneral
+Route::get('/VerReporte/{idReporte}', [
+    'uses' => 'ReporteController@VerReporte',
+    'as' => 'ver-reporte'
+]);
+
+Route::get('/DescargarPDF/{id}', [
+    'uses' => 'ReporteController@pdfExportarReporte',
+    'as' => 'pdf-reporte'
+]);
+
 
 
 
